@@ -6,18 +6,18 @@ export class Snippet {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column({type: 'varchar', length: 255})
     title!: string;
 
-    @Column()
+    @Column({type: 'varchar', length: 2000})
     code!: string
 
-    @Column()
+    @Column({type: 'varchar', length: 255})
     description!: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ type: "timestamp" })
     dateCreation!: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: "timestamp" })
     dateUpdate!: Date;
 }

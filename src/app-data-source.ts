@@ -9,24 +9,33 @@ const isExistConnection = (dbName: string) : boolean => {
     return connectionMap.has(dbName)
 }
 
-const openConnection = async (dataSource: DataSource, dbName: string)  => {
-    try{
+const openConnection = async (dbName: string): Promise<DataSource> => {
+    const dataSource = connectionMap.get(dbName)
 
-        if(connectionMap.has(dbName)) {
-            return connectionMap.get(dbName)!
-        }
+    if(!dataSource) {
+        throw new Error(`No DataSource found for ${dbName}`)
+    }
 
-        await dataSource.initialize()
-    }catch(e){
-        console.error(e);
-        throw e;
+    if(dataSource.isInitialized) {
+        return dataSource
+    }
+
+    try {
+        return await dataSource.initialize()
+    } catch(e) {
+        console.error(e)
+        throw e
     }
 }
 
 const closeConnection  = async (dbName: string, dataSource: DataSource) => {
 
     try{
-        await dataSource.destroy()
+
+        if(dataSource.isInitialized) {
+            await dataSource.destroy()
+        }
+
     }catch (error) {
         console.error(error);
         throw error;
