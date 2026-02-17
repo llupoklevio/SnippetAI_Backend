@@ -24,7 +24,8 @@ const main = async () => {
                database: db,
             })
         }else{
-            throw new Error("only one connection for db by server starter");
+            console.log("Is not expected to have an open connection")
+            process.exit(1);
         }
 
         /** Avvio connessione con db **/
@@ -43,4 +44,4 @@ const main = async () => {
     }
 }
 
-main()
+await main()
