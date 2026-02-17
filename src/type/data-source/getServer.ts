@@ -1,7 +1,5 @@
 import type {IConnectionType} from "./connectionType.js";
 
-console.log(process.env.POSTGRES_HOST, process.env.POSTGRES_PORT, process.env.POSTGRES_USER);
-
 export const getServer = (serverName : IConnectionType["serverName"]) => {
     switch (serverName) {
         case "postgres":
@@ -19,6 +17,5 @@ export const getServer = (serverName : IConnectionType["serverName"]) => {
                 port: Number(process.env.MYSQL_PORT),
                 connectorPackage: "mysql2" as const,
             }
-
     }
 }
