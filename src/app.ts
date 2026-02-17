@@ -18,7 +18,8 @@ app.use(express.json())
 
 /** Swagger attraverso la libreria Zod **/
 const swaggerDocument = getSwaggerDoc()
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+if(process.env.NODE_ENV !== "production")
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /** Routes **/
 app.use("/snippets", snippetsRoute)
