@@ -8,8 +8,13 @@ const isExistConnection = (dbName: string) : boolean => {
     return connectionMap.has(dbName)
 }
 
-const openConnection = async (dataSource: DataSource)  => {
+const openConnection = async (dataSource: DataSource, dbName: string)  => {
     try{
+
+        if(connectionMap.has(dbName)) {
+            return connectionMap.get(dbName)!
+        }
+
         await dataSource.initialize()
     }catch(e){
         console.error(e);
@@ -36,17 +41,14 @@ const closeConnection  = async (dbName: string, dataSource: DataSource) => {
 
 }
 
-const instanceDataSource = ({dbName,serverName, synchronize} : IConnectionType) : DataSource => {
-
-    if(connectionMap.has(dbName)) {
-       return connectionMap.get(dbName)!
-    }
+const instanceDataSource = ({dbName,serverName, synchronize, database} : IConnectionType) : DataSource => {
 
     const instance = new DataSource({
         type: serverName,
         synchronize: synchronize,
         entities: [],
-        database: dbName,
+        schema: dbName,
+        database: database,
         ...getServer(serverName)
     } as DataSourceOptions)
 
