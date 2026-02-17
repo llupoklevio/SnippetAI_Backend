@@ -6,6 +6,7 @@ dotenv.config();
 const main = () => {
     try{
 
+        /** Avvio software **/
         app.listen(process.env.PORT_SERVER)
         console.log("Server is running on port: " + process.env.PORT_SERVER)
 
