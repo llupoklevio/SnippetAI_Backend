@@ -1,9 +1,10 @@
-import app from "./app.js"
 import dotenv from 'dotenv';
+dotenv.config();
+import app from "./app.js"
 import {instanceDataSource, isExistConnection} from "./app-data-source.js";
 import type {DataSource} from "typeorm";
 
-dotenv.config();
+
 
 const schema = process.env.SCHEMA_DEV!
 const db = process.env.POSTGRES_DB!
@@ -16,11 +17,13 @@ let datasource : DataSource | null = null;
 const main = async () => {
     try{
 
+        console.log(process.env.NODE_ENV, "in che stato sono");
+
         if(!isExistConnection(schema)){
            datasource = instanceDataSource({
                 serverName: "postgres",
                 dbName: schema,
-                synchronize: true,
+                synchronize: process.env.NODE_ENV === "development",
                database: db,
             })
         }else{

@@ -1,6 +1,7 @@
 import type {IConnectionType} from "./type/data-source/connectionType.js";
 import {DataSource, type DataSourceOptions} from "typeorm";
 import {getServer} from "./type/data-source/getServer.js";
+import {getEntities} from "./type/data-source/getEntities.js";
 
 let connectionMap = new Map<string, DataSource>();
 
@@ -46,7 +47,7 @@ const instanceDataSource = ({dbName,serverName, synchronize, database} : IConnec
     const instance = new DataSource({
         type: serverName,
         synchronize: synchronize,
-        entities: [],
+        entities: getEntities(serverName),
         schema: dbName,
         database: database,
         ...getServer(serverName)
