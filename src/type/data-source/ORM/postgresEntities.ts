@@ -1,4 +1,4 @@
-import {Snippet} from "../../../entities/snippet.entity.js";
+import {Snippet} from "../../../entities/postgres/snippet.entity.js";
 
 export const getEntitiesPostgresORM = [
     Snippet
