@@ -9,7 +9,7 @@ export class Snippet {
     @Column({type: 'varchar', length: 255})
     title!: string;
 
-    @Column({type: 'varchar', length: 2000})
+    @Column({type: 'text'})
     code!: string
 
     @Column({type: 'varchar', length: 255})
