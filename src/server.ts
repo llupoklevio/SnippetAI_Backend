@@ -30,7 +30,6 @@ const main = async () => {
 
         /** Avvio connessione con db **/
         await datasource.initialize()
-
         setDataSource(datasource)
 
         console.log("Initializing...", datasource.options)
