@@ -1,13 +1,20 @@
 import {Repository} from "typeorm";
 import {User} from "../../entities/postgres/user.entity.js";
 import {IregisterValidator} from "../type/validatorTypeRegister.js";
+import * as argon2 from "argon2";
 
 export class UserService {
     constructor(
         private repository: Repository<User>
     ) {}
 
-    async registerUserDB(dataToRegister : IregisterValidator, passwordHashed: string) : Promise<User> {
+    async registerUserDB(dataToRegister : IregisterValidator) : Promise<User> {
+
+        /** Hashing per salvare la password hashata nel DB */
+        const passwordHashed = await argon2.hash(dataToRegister.password, {
+            type: argon2.argon2id,
+            parallelism: 1
+        })
 
         const userToSave : User = new User()
         userToSave.firstName= dataToRegister.firstName

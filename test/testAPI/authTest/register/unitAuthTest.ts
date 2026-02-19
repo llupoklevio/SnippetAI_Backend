@@ -1,6 +1,5 @@
-import {beforeAll, afterAll, describe,it, expect} from "vitest"
+import {beforeAll, afterAll, describe} from "vitest"
 import {Repository} from "typeorm";
-import request from "supertest";
 import {User} from "../../../../src/entities/postgres/user.entity";
 import {setup, teardown} from "../../../setup";
 import {getDataSource} from "../../../../src/type/data-source/getDataSourceByEnv";

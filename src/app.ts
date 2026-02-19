@@ -11,8 +11,17 @@ import authRoute from "./routes/auth.js"
 import {getSwaggerDoc} from "./swagger/swaggerRegistry.js";
 
 import "./feature/index.js"
+import {defaultErrorMiddleware, PostgresErrorMiddleware} from "./middleware/error/errorMiddleware.js";
+
+import {logger} from "./logger/logger.js";
+import { pinoHttp } from 'pino-http';
 
 const app = express()
+
+/** logger **/
+app.use(pinoHttp({
+    logger
+}));
 
 /** Per leggere il req.body **/
 app.use(express.json())
@@ -27,5 +36,6 @@ app.use("/snippets", snippetsRoute)
 app.use("/auth", authRoute)
 
 /** Middleware **/
+app.use([PostgresErrorMiddleware,defaultErrorMiddleware])
 
 export default app
