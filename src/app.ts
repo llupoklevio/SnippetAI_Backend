@@ -7,6 +7,7 @@ import express from "express"
 import swaggerUi from 'swagger-ui-express';
 
 import snippetsRoute from "./routes/snippet.js"
+import authRoute from "./routes/auth.js"
 import {getSwaggerDoc} from "./swagger/swaggerRegistry.js";
 
 import "./feature/index.js"
@@ -23,6 +24,7 @@ if(process.env.NODE_ENV !== "production")
 
 /** Routes **/
 app.use("/snippets", snippetsRoute)
+app.use("/auth", authRoute)
 
 /** Middleware **/
 
