@@ -3,7 +3,10 @@ import {ResponsePostSnippet} from "../type/responseSnippet.js";
 import {postSnippet} from "./snippetDefinetion.js";
 
 export const SchemaPostSnippet = {
-    Response: registry.register('responsePostSnippet',ResponsePostSnippet)
+    Response: registry.register(
+        'responsePostSnippet',
+        (ResponsePostSnippet as unknown) as any
+    )
 }
 
 registry.registerPath(

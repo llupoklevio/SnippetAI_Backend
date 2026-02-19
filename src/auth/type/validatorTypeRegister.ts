@@ -3,17 +3,14 @@ import { z } from 'zod';
 export const registerValidator = z.object({
     firstName: z.string()
         .trim()
-        .lowercase()
         .min(1, "First name is required")
         .regex(/^[a-zA-Z]+$/, "Only words"),
     lastName: z.string()
         .trim()
-        .lowercase()
         .min(1, "First name is required")
         .regex(/^[a-zA-Z]+$/, "Only words"),
     email: z.string()
         .trim()
-        .lowercase()
         .min(6, "Email is required")
         .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), "Invalid email address"),
     password: z.string()

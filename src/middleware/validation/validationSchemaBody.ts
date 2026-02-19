@@ -5,8 +5,7 @@ export const validationSchemaBody = (schema : z.ZodObject<z.ZodRawShape>) =>  as
 
     try{
 
-        (res as any).validDataBody = await schema.parseAsync(req.body);
-
+        (req as any).validDataBody =  await schema.parseAsync(req.body);
         next()
 
     }catch(err){
