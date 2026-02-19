@@ -14,6 +14,7 @@ export const registerValidator = z.object({
     email: z.string()
         .trim()
         .lowercase()
+        .min(6, "Email is required")
         .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), "Invalid email address"),
     password: z.string()
         .trim()
@@ -21,3 +22,5 @@ export const registerValidator = z.object({
         .regex(/[A-Z]/, "One word must be uppercased")
         .regex(/[0-9]/, "One ore more numbers must be on password")
 })
+
+export type IregisterValidator = z.infer<typeof registerValidator>;
