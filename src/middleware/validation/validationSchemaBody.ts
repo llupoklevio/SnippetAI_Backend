@@ -11,12 +11,21 @@ export const validationSchemaBody = (schema : z.ZodObject<z.ZodRawShape>) =>  as
     }catch(err){
         if(err instanceof ZodError){
 
+            const errors = err.issues.map(err => ({
+                path: err.path.map(p => String(p)),
+                message: err.message,
+            }))
+
+            const grouped = errors.reduce((acc, error) => {
+                const key = error.path[0]!
+                if (!acc[key]) acc[key] = []
+                acc[key].push(error.message)
+                return acc
+            }, {} as Record<string, string[]>)
+
             const responseError : IAuthValidationError = {
                 message: "Error - Invalid data input",
-                errors: err.issues.map(err => ({
-                    path: err.path.map(p => String(p)),
-                    message: err.message,
-                }))
+                errors: grouped
             }
 
             return res.status(400).json(responseError)
@@ -28,10 +37,7 @@ export const validationSchemaBody = (schema : z.ZodObject<z.ZodRawShape>) =>  as
 
 export const AuthValidationBodyError = z.object({
     message: z.string(),
-    errors: z.array(z.object({
-        path: z.array(z.string()),
-        message: z.string(),
-    }))
+    errors: z.record(z.string(), z.array(z.string()))
 })
 
 export type IAuthValidationError = z.infer<typeof AuthValidationBodyError>;

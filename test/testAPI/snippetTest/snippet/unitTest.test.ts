@@ -1,10 +1,10 @@
-import {Snippet} from "../../../src/entities/postgres/snippet.entity.js";
-import { setup, teardown} from "../../setup";
+import {Snippet} from "../../../../src/entities/postgres/snippet.entity.js";
+import { setup, teardown} from "../../../setup";
 import {beforeAll, afterAll, describe,it, expect} from "vitest"
 import {Repository} from "typeorm";
-import app from "../../../src/app.js"
+import app from "../../../../src/app.js"
 import request from "supertest";
-import {getDataSource} from "../../../src/type/data-source/getDataSourceByEnv";
+import {getDataSource} from "../../../../src/type/data-source/getDataSourceByEnv";
 
 let snippetRepository : Repository<Snippet>
 
