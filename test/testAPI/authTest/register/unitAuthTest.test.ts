@@ -7,7 +7,7 @@ import request from "supertest";
 import app from "../../../../src/app";
 import {
     errorValidator,
-    errorValidatorWrongType,
+    errorValidatorWrongType, getChecks, zodTypeMap,
 } from "./utilsRegisterTest";
 import {registerValidator} from "../../../../src/auth/type/validatorTypeRegister";
 import {
@@ -56,10 +56,8 @@ describe("SNIPPET API", () => {
              *
              **/
 
-            const bodyError : IAuthValidationError["errors"] = responseErrorValidator.body.errors
-            expect(Object.keys(bodyError).length).equal(1)
-            const result = bodyError.undefined!
-            expect(result[0]).equal("Invalid input: expected object, received undefined");
+            const bodyError = responseErrorValidator.body.errors
+            expect(bodyError["path"].pop()).equal("Required");
         })
 
         it("request with empty body", async () => {
@@ -80,20 +78,13 @@ describe("SNIPPET API", () => {
              *
              **/
 
-            const bodyError : IAuthValidationError["errors"] = responseErrorValidator.body.errors
+            const bodyError = responseErrorValidator.body.errors
             expect(Object.keys(bodyError).length).equal(4);
 
-            const typeValidatorPathFirstName = registerValidator.shape['firstName']._def.type
-            expect(bodyError.firstName![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathFirstName}, received undefined`);
-
-            const typeValidatorPathLastName = registerValidator.shape['lastName']._def.type
-            expect(bodyError.lastName![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathLastName}, received undefined`);
-
-            const typeValidatorPathPassword = registerValidator.shape['password']._def.type
-            expect(bodyError.password![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathPassword}, received undefined`);
-
-            const typeValidatorPathEmail = registerValidator.shape['email']._def.type
-            expect(bodyError.email![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathEmail}, received undefined`);
+            expect(bodyError["firstName"].pop()).equal("Required");
+            expect(bodyError["lastName"].pop()).equal("Required");
+            expect(bodyError["email"].pop()).equal("Required");
+            expect(bodyError["password"].pop()).equal("Required");
 
         })
 
@@ -106,20 +97,22 @@ describe("SNIPPET API", () => {
 
             expect(responseErrorValidatorWrongType.status).equal(400);
 
-            const bodyErrorWrong : IAuthValidationError["errors"] = responseErrorValidatorWrongType.body.errors
+            const bodyErrorWrong = responseErrorValidatorWrongType.body.errors
             expect(Object.keys(bodyErrorWrong).length).equal(4);
 
-            const typeValidatorPathFirstName = registerValidator.shape['firstName']._def.type
-            expect(bodyErrorWrong.firstName![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathFirstName}, received ${typeof errorValidatorWrongType.firstName}`);
 
-            const typeValidatorPathLastName = registerValidator.shape['lastName']._def.type
-            expect(bodyErrorWrong.lastName![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathLastName}, received ${typeof errorValidatorWrongType.lastName}`);
+            const typeValidatorPathFirstName = registerValidator.shape['firstName']._def.typeName
+            expect(bodyErrorWrong["firstName"].pop()).equal(`Expected ${zodTypeMap[typeValidatorPathFirstName]}, received ${typeof errorValidatorWrongType.firstName}`);
 
-            const typeValidatorPathPassword = registerValidator.shape['password']._def.type
-            expect(bodyErrorWrong.password![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathPassword}, received ${typeof errorValidatorWrongType.password}`);
+            const typeValidatorPathLastName = registerValidator.shape['lastName']._def.typeName
+            expect(bodyErrorWrong["lastName"].pop()).equal(`Expected ${zodTypeMap[typeValidatorPathLastName]}, received ${typeof errorValidatorWrongType.lastName}`);
 
-            const typeValidatorPathEmail = registerValidator.shape['email']._def.type
-            expect(bodyErrorWrong.email![0]).to.deep.equal(`Invalid input: expected ${typeValidatorPathEmail}, received ${typeof errorValidatorWrongType.email}`);
+            const typeValidatorPathEmail = registerValidator.shape['email']._def.schema._def.typeName
+            expect(bodyErrorWrong["email"].pop()).equal(`Expected ${zodTypeMap[typeValidatorPathEmail]}, received ${typeof errorValidatorWrongType.email}`);
+
+            const typeValidatorPathPassword = registerValidator.shape['password']._def.typeName
+            expect(bodyErrorWrong["password"].pop()).equal(`Expected ${zodTypeMap[typeValidatorPathPassword]}, received ${typeof errorValidatorWrongType.password}`);
+
         })
 
 
@@ -132,29 +125,52 @@ describe("SNIPPET API", () => {
             expect(responseErrorValidatorWrongVlue.status).equal(400);
 
             const bodyError : IAuthValidationError["errors"] = responseErrorValidatorWrongVlue.body.errors
-
             expect(Object.keys(bodyError).length).equal(4);
 
             /** prendiamo tutti gli errori verificatosi dal validator per firstName che ci asppettiamo **/
-            const rulesValidatorPathFirstName = registerValidator.shape["firstName"]._def.checks
-            const errorFirstName = rulesValidatorPathFirstName!.map((check) => {
-                const def = (check as any)._zod.def
-                return {type:def.check, err: def.error && def.error()}
-            }).filter((err) => {
-                return err.err
-            })
+            const errorFirstName = getChecks('firstName')
 
             /** verifichiamo se gli errori previsti da noi coincidono con quelli restituiti dal validator **/
             expect(errorFirstName.length).equal(2);
-            expect(errorFirstName.some(e => e.type === "min_length")).equal(true)
-            expect(errorFirstName.some(e => e.type === "string_format")).equal(true)
+            expect(errorFirstName.some(e => e.type === "min")).equal(true)
+            expect(errorFirstName.some(e => e.type === "regex")).equal(true)
 
             /** verifichiamo se la rispsota dell' API coincide con il validator **/
             expect(bodyError.firstName!.every((value) => errorFirstName.map(e => e.err).includes(value))).equal(true)
 
+            /** lastName **/
+            const errorLastName = getChecks('lastName')
+            expect(errorLastName.length).equal(2);
+            expect(errorLastName.some(e => e.type === "min")).equal(true)
+            expect(errorLastName.some(e => e.type === "regex")).equal(true)
+
+            expect(bodyError.lastName!.every((value) => errorLastName.map(e => e.err).includes(value))).equal(true)
+
+            /** email **/
+            const errorEmail = getChecks('email')
+
+            expect(errorEmail.length).equal(2);
+            expect(errorEmail.some(e => e.type === "min")).equal(true)
+            expect(errorEmail.some(e => e.type === "custom")).equal(true)
+
+            expect(bodyError.email!.every((value) => errorEmail.map(e => e.err).includes(value))).equal(true)
+
+            /** password **/
+            const errorPassword = getChecks('password')
+
+            expect(errorPassword.length).equal(3);
+            expect(errorPassword.some(e => e.type === "min")).equal(true)
+            expect(errorPassword.some(e => e.type === "regex")).equal(true)
+            expect(errorPassword.some(e => (e.type !== "regex" && e.type !== "min"))).equal(false)
+
+            expect(bodyError.password!.every((value) => errorPassword.map(e => e.err).includes(value)))
+
             /** verifichiamo che il db sia vuoto **/
+            const user = await userRepository.find()
+            expect(user.length).equal(0);
 
             /** verifichiamo che lo swagger coincida con le risposte previste **/
+
         })
 
     })
