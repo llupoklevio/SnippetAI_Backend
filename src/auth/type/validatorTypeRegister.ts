@@ -7,7 +7,7 @@ export const registerValidator = z.object({
         .regex(/^[a-zA-Z]+$/, "Only words"),
     lastName: z.string()
         .trim()
-        .min(1, "First name is required")
+        .min(1, "Last name is required")
         .regex(/^[a-zA-Z]+$/, "Only words"),
     email: z.string()
         .trim()
