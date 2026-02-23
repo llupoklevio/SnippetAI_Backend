@@ -18,6 +18,8 @@ export const login = async(req: Request, res: Response) => {
      *      generare token
      * */
 
+    req.log.info(`${dataToLogin.email} si è loggato`)
+
     res.json({
         message: "ok"
     })

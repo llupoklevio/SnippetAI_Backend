@@ -11,5 +11,11 @@ export const getSwaggerDoc = () => {
             version: "1.0.0",
             description: "Automatic documentation",
         },
+        tags: [
+            {
+                name: 'Auth',
+                description: 'Gestione autenticazione utenti',
+            }
+        ]
     })
 }
