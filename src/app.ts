@@ -33,18 +33,17 @@ app.use(pinoHttp({
 /** Per leggere il req.body **/
 app.use(express.json())
 
-/** Cors */
+/** Cors
+ *
+ * Non si ha ancora un host per fe
+ *
+ * */
 app.use(cors({
     origin: "*"
 }));
 
 /** AI */
-export let modelAI: any = null;
-
-setupModelAI().then(model => {
-    modelAI = model;
-    if (modelAI) console.log("AI Model caricato correttamente");
-});
+void setupModelAI();
 
 /** rateLimit */
 app.use(limiter)
