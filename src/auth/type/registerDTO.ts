@@ -8,3 +8,10 @@ export const registerDTO = z.object({
 })
 
 export type typeRegisterDTO = z.infer<typeof registerDTO>
+
+
+export const responseRegisterSuccess = z.object({
+    user: registerDTO
+})
+
+export type typeResponseRegisterSuccess = z.infer<typeof responseRegisterSuccess>

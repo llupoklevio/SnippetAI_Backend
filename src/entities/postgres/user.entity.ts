@@ -1,6 +1,7 @@
-import {Column, Entity, PrimaryColumn} from "typeorm";
+import {Column, Entity, PrimaryColumn, Unique} from "typeorm";
 
 @Entity()
+@Unique(["email"])
 export class User {
     @PrimaryColumn({ type: "uuid", default: () => "gen_random_uuid()" })
     id!: string;
