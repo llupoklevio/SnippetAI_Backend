@@ -5,16 +5,23 @@ dotenv.config();
 
 import express from "express"
 import swaggerUi from 'swagger-ui-express';
+import cors from "cors"
 
 import snippetsRoute from "./routes/snippet.js"
 import authRoute from "./routes/auth.js"
 import {getSwaggerDoc} from "./swagger/swaggerRegistry.js";
 
 import "./feature/index.js"
-import {defaultErrorMiddleware, PostgresErrorMiddleware} from "./middleware/error/errorMiddleware.js";
+import {
+    CapturedErrorMiddleware,
+    defaultErrorMiddleware,
+    PostgresErrorMiddleware
+} from "./middleware/error/errorMiddleware.js";
 
 import {logger} from "./logger/logger.js";
 import { pinoHttp } from 'pino-http';
+import {setupModelAI} from "./AI/model.js";
+import {limiter} from "./RateLimiting/rate.js";
 
 const app = express()
 
@@ -26,6 +33,22 @@ app.use(pinoHttp({
 /** Per leggere il req.body **/
 app.use(express.json())
 
+/** Cors */
+app.use(cors({
+    origin: "*"
+}));
+
+/** AI */
+export let modelAI: any = null;
+
+setupModelAI().then(model => {
+    modelAI = model;
+    if (modelAI) console.log("AI Model caricato correttamente");
+});
+
+/** rateLimit */
+app.use(limiter)
+
 /** Swagger attraverso la libreria Zod **/
 const swaggerDocument = getSwaggerDoc()
 if(process.env.NODE_ENV !== "production")
@@ -36,6 +59,6 @@ app.use("/snippets", snippetsRoute)
 app.use("/auth", authRoute)
 
 /** Middleware **/
-app.use([PostgresErrorMiddleware,defaultErrorMiddleware])
+app.use([PostgresErrorMiddleware,CapturedErrorMiddleware,defaultErrorMiddleware])
 
 export default app

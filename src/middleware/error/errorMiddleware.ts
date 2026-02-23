@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import {HumanMessage, initChatModel, SystemMessage} from "langchain";
-import {BaseChatModel} from "@langchain/core/language_models/chat_models";
+import {HumanMessage, SystemMessage} from "langchain";
+import {ErrorResponse} from "./ErrorResponse.js";
+import {modelAI} from "../../app.js";
 
 //Awaited<ReturnType<typeof initChatModel>> da usare nelle liberie che cambiano spesso
-let model: BaseChatModel | null = null;
 
 export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, next: NextFunction) => {
     if (!(err.code || err.name === 'QueryFailedError')) return next(err);
@@ -47,21 +47,31 @@ export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, 
     }
 };
 
+export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+    if(err.typeError !== "BusinessLogicDB") next(err as any);
+
+    switch (err.code) {
+        case "EMAIL_ALREADY_EXISTS":
+            return res.status(409).json({
+                type: err.typeError,
+                message: err.message,
+            })
+    }
+}
+
 /** veranno aggiunti in futuro altri middleware ma per provare ai lascirò solo questo **/
 
-export const defaultErrorMiddleware = async (err: any, req: Request, res: Response, _next: NextFunction) => {
+export const defaultErrorMiddleware = async (err: any, _jreq: Request, res: Response, _next: NextFunction) => {
 
-    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST)) {
-
-        if (!model) model = await initChatModel("gpt-4.1");
+    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST) && modelAI) {
 
         const conversation = [
             new SystemMessage("Sei un assistente tecnico. Il tuo compito è spiegare l'errore all'utente in modo semplice, senza esporre dettagli sensibili del server (come path di file o password)."),
-            new HumanMessage(`Si è verificato il seguente errore: "${err.message}". Contesto della richiesta: ${req.method} ${req.url}. Spiega cosa potrebbe essere successo.`),
+            new HumanMessage(`Si è verificato il seguente errore: "${err.message}". Spiega cosa potrebbe essere successo.`),
         ];
 
         try {
-            const response = await model.invoke(conversation);
+            const response = await modelAI.invoke(conversation);
 
             res.status(500).json({
                 message: response.content,
@@ -74,6 +84,7 @@ export const defaultErrorMiddleware = async (err: any, req: Request, res: Respon
         }
 
     }else{
+
         res.status(500).json({
             message: "Errore interno del server."
         });

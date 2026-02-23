@@ -1,10 +1,10 @@
 import pino, { LoggerOptions } from 'pino';
 
 const pinoOptions: LoggerOptions = {
-    level: 'info',
+    level: process.env.NODE_ENV === 'development' ?'info' : 'silent',
 };
 
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV === 'development') {
     pinoOptions.transport = {
         target: 'pino-pretty',
         options: {

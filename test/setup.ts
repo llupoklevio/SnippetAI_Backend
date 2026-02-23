@@ -17,11 +17,19 @@ export async function setup() {
         myDataSource = instanceDataSource({
             serverName: "postgres",
             dbName: mainDbNameTest,
-            synchronize: true,
+            synchronize: false,
             database: process.env.POSTGRES_DB!,
         })
 
-        await myDataSource.initialize()
+        const tempConn = await myDataSource.initialize()
+
+        const schemaName = mainDbNameTest;
+
+        await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}";`);
+        await tempConn.query(`SET search_path TO "${schemaName}";`);
+        await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+
+        await tempConn.synchronize();
         setDataSource(myDataSource)
     }
 }
