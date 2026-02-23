@@ -7,6 +7,12 @@ import request from "supertest";
 import app from "../../../../src/app";
 import {createUser} from "./utilsRegisterTest";
 import * as argon2 from "argon2";
+import {getModelAI} from "../../../../src/AI/model";
+import {HumanMessage, SystemMessage} from "@langchain/core/messages";
+import {registerAuth} from "../../../../src/auth/swagger/registerDefinition";
+import {SchemaAuthRegister} from "../../../../src/auth/swagger/registerSchema";
+import {z} from "zod";
+import {authLimiterStore} from "../../../../src/RateLimiting/rate";
 
 let userRepository : Repository<User>
 
@@ -35,6 +41,8 @@ describe("AUTH API INTEGRATION", () => {
             .delete()
             .from(User)
             .execute()
+
+        await authLimiterStore.resetAll()
     })
 
         it("success", async () => {
@@ -73,5 +81,69 @@ describe("AUTH API INTEGRATION", () => {
             expect(failureResponse.body.message).deep.equal("L'email è già registrata")
         })
 
+
+
+})
+
+const AI_TESTS = process.env.AI_TESTS === "true"
+const describeAI = AI_TESTS ? describe : describe.skip
+
+describeAI("AUTH API AI INTEGRATION", () => {
+    it("edge AI check", async () => {
+        await authLimiterStore.resetAll()
+
+        const model = getModelAI()
+        if (!model) {
+            console.error("Ai is not available")
+            return
+        }
+
+        const modelWithStructuredResponse = model.withStructuredOutput(
+            z.object({
+                scenarios: z.array(z.object({
+                    description: z.string(),
+                    body: z.unknown(),
+                }))
+            }),
+            {method: "functionCalling"}
+        )
+
+        const contract = registerAuth({
+            path: "/auth/register",
+            summary: "Register a new user",
+            send: SchemaAuthRegister.Send,
+            response: SchemaAuthRegister.Response,
+            validator: SchemaAuthRegister.Validator,
+            error409: SchemaAuthRegister.ErrorDuplicated,
+            error500: SchemaAuthRegister.ServerError,
+        })
+
+        const context = [
+            new SystemMessage(`Sei un senior QA engineer.
+                                           Contratto dell'endpoint:
+                                           ${JSON.stringify(contract, null, 2)}
+                                           Genera scenari edge case che un tester umano non prevederebbe. 
+                                           Dammi solo strutture javascript come ${SchemaAuthRegister.Send}`),
+            new HumanMessage("Genera 10 scenari.")
+        ]
+
+        const result = await modelWithStructuredResponse.invoke(context)
+
+        for (const scenario of result.scenarios) {
+            console.log(scenario.body, "----", scenario.description)
+            const res = await request(app)
+                .post("/auth/register")
+                .send(scenario.body)
+
+            console.log(res.body, res.status)
+            /** Il server non crasha mai */
+            expect(res.status).not.equal(500)
+
+            expect([200, 201, 400, 409].includes(res.status)).equal(true)
+
+        }
+
+
+    }, 30_000)
 })
 
