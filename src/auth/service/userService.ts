@@ -2,6 +2,7 @@ import {Repository} from "typeorm";
 import {User} from "../../entities/postgres/user.entity.js";
 import {IregisterValidator} from "../type/validatorTypeRegister.js";
 import * as argon2 from "argon2";
+import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 
 export class UserService {
     constructor(
@@ -9,6 +10,14 @@ export class UserService {
     ) {}
 
     async registerUserDB(dataToRegister : IregisterValidator) : Promise<User> {
+
+        const user = await this.repository.findOneBy({
+            email: dataToRegister.email
+        })
+        if (user) {
+            throw new ErrorResponse("23505", "DB","")
+        }
+
 
         /** Hashing per salvare la password hashata nel DB */
         const passwordHashed = await argon2.hash(dataToRegister.password, {

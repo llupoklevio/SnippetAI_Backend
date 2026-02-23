@@ -46,7 +46,7 @@ describe("AUTH API INTEGRATION", () => {
                 .send(user)
 
 
-            expect(successResponse.status).equal(200)
+            expect(successResponse.status).equal(201)
 
             /** controllaimo che il db abbia salvato la password in formato hash */
             const responseUserDB = (await userRepository.findOneBy({id: successResponse.body.user.id}))!
@@ -63,7 +63,7 @@ describe("AUTH API INTEGRATION", () => {
                 .post("/auth/register")
                 .send(user)
 
-            expect(successResponse.status).equal(200)
+            expect(successResponse.status).equal(201)
 
             const failureResponse = await request(app)
             .post("/auth/register")

@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import {HumanMessage, initChatModel, SystemMessage} from "langchain";
+import {BaseChatModel} from "@langchain/core/language_models/chat_models";
 
-const model = await initChatModel("gpt-4.1");
-
+//Awaited<ReturnType<typeof initChatModel>> da usare nelle liberie che cambiano spesso
+let model: BaseChatModel | null = null;
 
 export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, next: NextFunction) => {
     if (!(err.code || err.name === 'QueryFailedError')) return next(err);
@@ -50,21 +51,29 @@ export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, 
 
 export const defaultErrorMiddleware = async (err: any, req: Request, res: Response, _next: NextFunction) => {
 
-    req.log.error(err);
+    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST)) {
 
-    const conversation = [
-        new SystemMessage("Sei un assistente tecnico. Il tuo compito è spiegare l'errore all'utente in modo semplice, senza esporre dettagli sensibili del server (come path di file o password)."),
-        new HumanMessage(`Si è verificato il seguente errore: "${err.message}". Contesto della richiesta: ${req.method} ${req.url}. Spiega cosa potrebbe essere successo.`),
-    ];
+        if (!model) model = await initChatModel("gpt-4.1");
 
-    try {
-        const response = await model.invoke(conversation);
+        const conversation = [
+            new SystemMessage("Sei un assistente tecnico. Il tuo compito è spiegare l'errore all'utente in modo semplice, senza esporre dettagli sensibili del server (come path di file o password)."),
+            new HumanMessage(`Si è verificato il seguente errore: "${err.message}". Contesto della richiesta: ${req.method} ${req.url}. Spiega cosa potrebbe essere successo.`),
+        ];
 
-        res.status( 500).json({
-            message: response.content,
-        });
+        try {
+            const response = await model.invoke(conversation);
 
-    } catch (aiError) {
+            res.status(500).json({
+                message: response.content,
+            });
+
+        } catch (aiError) {
+            res.status(500).json({
+                message: "Errore interno del server."
+            });
+        }
+
+    }else{
         res.status(500).json({
             message: "Errore interno del server."
         });

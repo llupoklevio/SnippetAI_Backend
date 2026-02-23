@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryColumn, Unique} from "typeorm";
+import {Column, Entity, OneToMany, PrimaryColumn, Relation, Unique} from "typeorm";
+import {UserSession} from "./userSession.js";
 
 @Entity()
 @Unique(["email"])
@@ -15,7 +16,10 @@ export class User {
     @Column({type: "varchar", length: 255})
     email!:string;
 
-    @Column({type: "varchar", length: 255})
+    @Column({type: "text"})
     password!:string;
+
+    @OneToMany(() => UserSession, (session) => session.user)
+    session?: Relation<UserSession[]>;
 
 }

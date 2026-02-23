@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
+import {User} from "./user.entity.js";
 
 @Entity()
 export class UserSession {
@@ -11,4 +12,7 @@ export class UserSession {
 
     @Column({ type: "timestamp" })
     expiresAt!: Date;
+
+    @ManyToOne(() => User, (user) => user.session)
+    user!: Relation<User>;
 }
