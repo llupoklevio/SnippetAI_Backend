@@ -70,7 +70,7 @@ describe("AUTH API INTEGRATION", () => {
             .send(user)
 
             expect(failureResponse.status).equal(409)
-            expect(failureResponse.body.message).deep.equal("Risorsa già esistente (duplicato).")
+            expect(failureResponse.body.message).deep.equal("L'email è già registrata")
         })
 
 })

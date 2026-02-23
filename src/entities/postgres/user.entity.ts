@@ -4,8 +4,9 @@ import {UserSession} from "./userSession.js";
 @Entity()
 @Unique(["email"])
 export class User {
-    @PrimaryColumn({ type: "uuid", default: () => "gen_random_uuid()" })
-    id!: string;
+
+    @PrimaryColumn("uuid")
+    id: string = crypto.randomUUID();
 
     @Column({type: "varchar", length: 255})
     firstName!:string;

@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import app from "./app.js"
 import {instanceDataSource, isExistConnection} from "./app-data-source.js";
 import type {DataSource} from "typeorm";
@@ -20,7 +18,7 @@ const main = async () => {
            datasource = instanceDataSource({
                 serverName: "postgres",
                 dbName: schema,
-                synchronize: process.env.NODE_ENV === "development",
+                synchronize: false,
                 database: db,
             })
         }else{
@@ -28,8 +26,20 @@ const main = async () => {
             process.exit(1);
         }
 
+        const tempConn = await datasource.initialize();
+
         /** Avvio connessione con db **/
-        await datasource.initialize()
+        if (process.env.NODE_ENV !== "production") {
+            const schemaFullName = schema;
+
+            await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schemaFullName}";`);
+            await tempConn.query(`SET search_path TO "${schemaFullName}";`);
+            await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+
+            await tempConn.synchronize();
+            console.log(`✅ Database pronto sullo schema: ${schemaFullName}`);
+        }
+
         setDataSource(datasource)
 
         console.log("Initializing...", datasource.options)
