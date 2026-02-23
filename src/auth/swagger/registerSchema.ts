@@ -7,15 +7,15 @@ import {responseRegisterSuccess} from "../type/registerDTO.js";
 export const SchemaAuthRegister = {
     Validator: registry.register(
         'validatorPostRegister',
-        (AuthValidationBodyError as unknown) as any
+        AuthValidationBodyError
     ),
     Send: registry.register(
         'sendPostRegister',
-        (registerValidator as unknown) as any
+        registerValidator
     ),
     Response: registry.register(
         'responsePostRegister',
-        (responseRegisterSuccess as unknown) as any
+        responseRegisterSuccess
     )
 }
 

@@ -26,7 +26,7 @@ export const register = async (req: Request, res: Response) => {
     const userResponse : typeRegisterDTO = await registerDTO.parseAsync(userSaved)
     req.log.info(`${userResponse.email} si è registrato`)
 
-    res.status(200).json({
+    res.status(201).json({
         user: userResponse
     })
 

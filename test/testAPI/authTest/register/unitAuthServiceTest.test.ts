@@ -5,7 +5,8 @@ import {User} from "../../../../src/entities/postgres/user.entity";
 import * as argon2 from "argon2";
 
 const mockRepository = {
-    save: vi.fn().mockImplementation((user: User) => Promise.resolve(user))
+    save: vi.fn().mockImplementation((user: User) => Promise.resolve(user)),
+    findOneBy: vi.fn().mockResolvedValue(null),
 };
 
 

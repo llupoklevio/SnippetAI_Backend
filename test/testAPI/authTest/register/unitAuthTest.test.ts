@@ -221,7 +221,7 @@ describe("AUTH API CONTROLLER", () => {
                    .post("/auth/register")
                    .send(user)
 
-                expect(responseUser.status).equal(200);
+                expect(responseUser.status).equal(201);
 
                 /** user creato con successo , verifichiamo solo il controller*/
                 const userResponseBody : typeResponseRegisterSuccess = responseUser.body
