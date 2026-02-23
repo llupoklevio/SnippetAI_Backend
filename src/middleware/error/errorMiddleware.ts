@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {HumanMessage, SystemMessage} from "langchain";
 import {ErrorResponse} from "./ErrorResponse.js";
-import {modelAI} from "../../app.js";
+import {getModelAI} from "../../AI/model.js";
 
 //Awaited<ReturnType<typeof initChatModel>> da usare nelle liberie che cambiano spesso
 
@@ -48,7 +48,7 @@ export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, 
 };
 
 export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-    if(err.typeError !== "BusinessLogicDB") next(err as any);
+    if(err.typeError !== "BusinessLogicDB") return next(err as any);
 
     switch (err.code) {
         case "EMAIL_ALREADY_EXISTS":
@@ -56,6 +56,8 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
                 type: err.typeError,
                 message: err.message,
             })
+        default:
+            next(err as any);
     }
 }
 
@@ -63,7 +65,9 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
 
 export const defaultErrorMiddleware = async (err: any, _jreq: Request, res: Response, _next: NextFunction) => {
 
-    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST) && modelAI) {
+    const model = getModelAI()
+
+    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST) && model) {
 
         const conversation = [
             new SystemMessage("Sei un assistente tecnico. Il tuo compito è spiegare l'errore all'utente in modo semplice, senza esporre dettagli sensibili del server (come path di file o password)."),
@@ -71,7 +75,7 @@ export const defaultErrorMiddleware = async (err: any, _jreq: Request, res: Resp
         ];
 
         try {
-            const response = await modelAI.invoke(conversation);
+            const response = await model.invoke(conversation);
 
             res.status(500).json({
                 message: response.content,
