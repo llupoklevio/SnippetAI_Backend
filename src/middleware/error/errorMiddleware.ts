@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import {HumanMessage, SystemMessage} from "langchain";
 import {ErrorResponse} from "./ErrorResponse.js";
-import {getModelAI} from "../../AI/model.js";
 
 //Awaited<ReturnType<typeof initChatModel>> da usare nelle liberie che cambiano spesso
 
@@ -63,35 +61,10 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
 
 /** veranno aggiunti in futuro altri middleware ma per provare ai lascirò solo questo **/
 
-export const defaultErrorMiddleware = async (err: any, _jreq: Request, res: Response, _next: NextFunction) => {
+export const defaultErrorMiddleware = async (_err: any, _jreq: Request, res: Response, _next: NextFunction) => {
 
-    const model = getModelAI()
-
-    if(process.env.NODE_ENV === 'development' && Boolean(process.env.USEAITEST) && model) {
-
-        const conversation = [
-            new SystemMessage("Sei un assistente tecnico. Il tuo compito è spiegare l'errore all'utente in modo semplice, senza esporre dettagli sensibili del server (come path di file o password)."),
-            new HumanMessage(`Si è verificato il seguente errore: "${err.message}". Spiega cosa potrebbe essere successo.`),
-        ];
-
-        try {
-            const response = await model.invoke(conversation);
-
-            res.status(500).json({
-                message: response.content,
-            });
-
-        } catch (aiError) {
-            res.status(500).json({
-                message: "Errore interno del server."
-            });
-        }
-
-    }else{
-
-        res.status(500).json({
-            message: "Errore interno del server."
-        });
-    }
+    res.status(500).json({
+        message: "Errore interno del server."
+    });
 
 }

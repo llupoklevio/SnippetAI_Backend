@@ -15,6 +15,7 @@ import {
     IAuthValidationError
 } from "../../../../src/middleware/validation/validationSchemaBody";
 import {typeResponseRegisterSuccess} from "../../../../src/auth/type/registerDTO";
+import {authLimiterStore} from "../../../../src/RateLimiting/rate";
 
 let userRepository : Repository<User>
 
@@ -58,6 +59,8 @@ describe("AUTH API CONTROLLER", () => {
                     .delete()
                     .from(User)
                     .execute()
+
+
             })
 
             it("request with undefined body", async () => {
@@ -234,6 +237,33 @@ describe("AUTH API CONTROLLER", () => {
 
             })
 
+        })
+
+        describe("Rate Limit", () => {
+            it("personality rate for register max 10", async () => {
+                await authLimiterStore.resetAll()
+                for(let i=0; i<11; i++){
+
+                    const user = createUser({
+                        firstName: "tester",
+                        lastName: "snippetAI",
+                        email: "test@snippet.it",
+                        password: "Snippet20",
+                    })
+
+                    const responseUser = await request(app)
+                        .post("/auth/register")
+                        .send(user)
+
+                    if(i==9){
+                        expect(responseUser.status).equal(201);
+                    }
+                    if(i==10){
+                        expect(responseUser.status).equal(429);
+                    }
+                }
+
+            })
         })
 
 

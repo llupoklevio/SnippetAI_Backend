@@ -1,6 +1,6 @@
 import {IbaseStruct} from "../../type/swagger/baseStructureDefinitionAPI.js";
 
-export const registerAuth = ({path,summary,send,response,validator} : IbaseStruct & {send: any,validator : any}) => ({
+export const registerAuth = ({path,summary,send,response,validator,error409, error500} : IbaseStruct & {send: any,validator : any, error409: any}) => ({
     method: "post" as const,
     path: path,
     summary: summary,
@@ -16,6 +16,13 @@ export const registerAuth = ({path,summary,send,response,validator} : IbaseStruc
             description: "Swagger validation failed.",
             content: {'application/json': {schema: validator}}
         },
-
+        409: {
+            description: "Email already exists",
+            content: {'application/json': {schema: error409}}
+        },
+        500: {
+            description: "Server Error",
+            content: {'application/json': {schema: error500}}
+        }
     }
 })
