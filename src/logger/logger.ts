@@ -4,7 +4,7 @@ const pinoOptions: LoggerOptions = {
     level: 'info',
 };
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'development') {
     pinoOptions.transport = {
         target: 'pino-pretty',
         options: {

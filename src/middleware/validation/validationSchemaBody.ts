@@ -18,7 +18,6 @@ export const validationSchemaBody = (schema : z.ZodObject<z.ZodRawShape>) =>  as
 
             const grouped = errors.reduce((acc, error) => {
                 const key = error.path[0] || "path"
-                console.log(key)
                 if (!acc[key]) acc[key] = []
                 acc[key].push(error.message)
                 return acc

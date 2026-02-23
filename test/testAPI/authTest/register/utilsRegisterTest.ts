@@ -1,6 +1,4 @@
-//import * as z from "zod";
 import {IregisterValidator, registerValidator} from "../../../../src/auth/type/validatorTypeRegister";
-
 
 export const errorValidator : IregisterValidator = {
     email: "",
@@ -14,6 +12,29 @@ export const errorValidatorWrongType = {
     password:20 ,
     lastName: 20,
     firstName: 20
+}
+
+export const defaultUser : IregisterValidator = {
+    firstName: "User",
+    lastName: "Test",
+    password: "UserTest20",
+    email: "user@test.com"
+}
+
+/**
+ * Crea un utente valido per i test.
+ * @param user - Campi da sovrascrivere
+ * @param user.firstName - Solo lettere, min 1 carattere (es. "Klevio")
+ * @param user.lastName - Solo lettere, min 1 carattere (es. "Llupo")
+ * @param user.email - Email valida (es. "klevio@gmail.com")
+ * @param user.password - Min 6 caratteri, una maiuscola, un numero (es. "Klevio03")
+ */
+export const createUser = (user : Partial<IregisterValidator>) : IregisterValidator => {
+    const userResponse : IregisterValidator = Object.assign(defaultUser)
+
+    return {
+        ...Object.assign(userResponse, user)
+    }
 }
 
 type pathRegisterValidator = 'firstName' | 'lastName' | 'email' | 'password'
