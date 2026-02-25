@@ -25,7 +25,7 @@ export type typeResponseRegisterSuccess = z.infer<typeof responseRegisterSuccess
 export const errorDB409 = z.object({
     type: op(z.string(),{examples: [
             "DATABASE_ERROR",
-            "BusinessLogicDB"
+            "BusinessLogic"
         ]}),
     message: op(z.string(),{examples: [
             "Risorsa già esistente (duplicato).",
