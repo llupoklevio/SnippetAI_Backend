@@ -46,11 +46,16 @@ export const PostgresErrorMiddleware = (err: any, _req: Request, res: Response, 
 };
 
 export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-    if(err.typeError !== "BusinessLogicDB") return next(err as any);
+    if(err.typeError !== "BusinessLogic") return next(err as any);
 
     switch (err.code) {
         case "EMAIL_ALREADY_EXISTS":
             return res.status(409).json({
+                type: err.typeError,
+                message: err.message,
+            })
+        case "NOT_FOUND":
+            return res.status(404).json({
                 type: err.typeError,
                 message: err.message,
             })

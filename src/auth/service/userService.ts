@@ -15,7 +15,7 @@ export class UserService {
             email: dataToRegister.email
         })
         if (user) {
-            throw new ErrorResponse("EMAIL_ALREADY_EXISTS", "BusinessLogicDB", "L'email è già registrata");
+            throw new ErrorResponse("EMAIL_ALREADY_EXISTS", "BusinessLogic", "L'email è già registrata");
         }
 
 

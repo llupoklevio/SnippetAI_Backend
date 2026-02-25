@@ -4,6 +4,7 @@ import {AuthValidationBodyError} from "../../middleware/validation/validationSch
 import {registerValidator} from "../type/validatorTypeRegister.js";
 import {error500, errorDB409, responseRegisterSuccess} from "../type/registerDTO.js";
 import {loginValidator} from "../type/validatorTypeLogin.js";
+import {errorNotFound, responseLoginAPI} from "../type/loginDTO.js";
 
 export const SchemaAuthRegister = {
     Validator: registry.register(
@@ -49,6 +50,14 @@ export const SchemaAuthLogin = {
         'sendPostLogin',
         loginValidator
     ),
+    Response: registry.register(
+        'responsePostLogin',
+        responseLoginAPI
+    ),
+    ErrorNotFound: registry.register(
+        'errorNotFound',
+        errorNotFound
+    ),
     ServerError: registry.register(
         'serverError',
         error500
@@ -60,7 +69,9 @@ registry.registerPath(
         path: "/auth/login",
         summary: "login a user",
         send: SchemaAuthLogin.Send,
+        response: SchemaAuthLogin.Response,
         validator: SchemaAuthLogin.Validator,
+        error404:SchemaAuthLogin.ErrorNotFound,
         error500: SchemaAuthLogin.ServerError
     })
 )
