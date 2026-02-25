@@ -66,10 +66,10 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
 
 /** veranno aggiunti in futuro altri middleware ma per provare ai lascirò solo questo **/
 
-export const defaultErrorMiddleware = async (_err: any, _jreq: Request, res: Response, _next: NextFunction) => {
+export const defaultErrorMiddleware = async (err: any, _jreq: Request, res: Response, _next: NextFunction) => {
 
     res.status(500).json({
-        message: "Errore interno del server."
+        message: err.message ||"Errore interno del server."
     });
 
 }
