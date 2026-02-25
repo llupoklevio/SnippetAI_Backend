@@ -1,4 +1,5 @@
 import {IregisterValidator, registerValidator} from "../../../src/auth/type/validatorTypeRegister";
+import {typeLoginValidator} from "../../../src/auth/type/validatorTypeLogin";
 
 export const errorValidator : IregisterValidator = {
     email: "",
@@ -38,8 +39,9 @@ export const createUser = (user : Partial<IregisterValidator>) : IregisterValida
 }
 
 type pathRegisterValidator = 'firstName' | 'lastName' | 'email' | 'password'
+type pathLoginValidator = 'email' | 'password'
 
-export function getChecks(path: pathRegisterValidator): { type: string, err: string }[] {
+export function getChecks(path: pathRegisterValidator | pathLoginValidator): { type: string, err: string }[] {
     const shape = registerValidator.shape[path] as any
 
     const schema = shape._def.schema ?? shape
@@ -64,4 +66,16 @@ export const zodTypeMap: Record<string, string> = {
     ZodNumber: "number",
     ZodBoolean: "boolean",
     ZodDate: "date",
+}
+
+/** ###### LOGIN ######### */
+
+export const errorValidatorWrongTypeLogin = {
+    email: 20,
+    password:20 ,
+}
+
+export const errorValidatorLogin : typeLoginValidator = {
+    email: "",
+    password:"" ,
 }

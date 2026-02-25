@@ -42,9 +42,6 @@ describe("AUTH API INTEGRATION", () => {
                 .post("/auth/register")
                 .send(user)
 
-            console.log("status ricevuto:", successResponse.status)
-            console.log("body:", successResponse.body)
-
             expect(successResponse.status).equal(201)
 
             /** controllaimo che il db abbia salvato la password in formato hash */
