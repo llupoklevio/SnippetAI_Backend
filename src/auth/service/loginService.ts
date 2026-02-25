@@ -17,7 +17,6 @@ export class LoginService {
 
     async LogUser(dataToLogin : typeLoginValidator) {
 
-
         const user = await this.userRepository.findOneBy({
             email: dataToLogin.email,
         })

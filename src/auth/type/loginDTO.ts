@@ -17,10 +17,14 @@ const responseServiceLogin = z.object({
     user: registerDTO
 })
 
+export type typeResponseServiceLogin = z.infer<typeof responseServiceLogin>
+
 export const responseLoginAPI = z.object({
     message: z.string(),
     session: responseServiceLogin
 })
+
+export type typeResponseLoginAPI = z.infer<typeof responseLoginAPI>
 
 export const errorNotFound = z.object({
     type: op(z.string(),{examples: [
