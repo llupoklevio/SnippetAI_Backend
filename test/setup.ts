@@ -6,13 +6,14 @@ import {closeConnection, instanceDataSource, isExistConnection, openConnection} 
 import {setDataSource} from "../src/type/data-source/getDataSourceByEnv";
 
 let myDataSource: DataSource | null = null;
-const mainDbNameTest = process.env.POSTGRES_TEST!
+const mainDbNameTest = `${process.env.POSTGRES_TEST!}_${process.env.VITEST_WORKER_ID ?? "0"}`
 
 console.log(process.env.POSTGRES_TEST!,"test db")
 
 export async function setup() {
     if(isExistConnection(mainDbNameTest)){
         myDataSource = await openConnection(mainDbNameTest)
+        setDataSource(myDataSource)
     }else{
         myDataSource = instanceDataSource({
             serverName: "postgres",
@@ -39,11 +40,14 @@ export async function teardown() {
         if(!myDataSource){
             throw new Error("Invalid datasource")
         }
+        await myDataSource.query(`DROP SCHEMA IF EXISTS "${mainDbNameTest}" CASCADE`)
+
         await closeConnection(mainDbNameTest,myDataSource)
     }else{
         throw new Error("Non si può chiudere una connessione non disponibile")
     }
 }
+
 
 
 
