@@ -1,4 +1,4 @@
-import {IregisterValidator, registerValidator} from "../../../../src/auth/type/validatorTypeRegister";
+import {IregisterValidator, registerValidator} from "../../../src/auth/type/validatorTypeRegister";
 
 export const errorValidator : IregisterValidator = {
     email: "",

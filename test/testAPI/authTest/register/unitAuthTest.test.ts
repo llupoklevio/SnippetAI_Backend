@@ -1,34 +1,28 @@
-import {beforeAll, afterAll, describe, it, expect, vi} from "vitest"
+import {beforeAll, describe, it, expect, vi} from "vitest"
 import {Repository} from "typeorm";
 import {User} from "../../../../src/entities/postgres/user.entity";
-import {setup, teardown} from "../../../setup";
 import {getDataSource} from "../../../../src/type/data-source/getDataSourceByEnv";
 import request from "supertest";
 import app from "../../../../src/app";
-import {
-    createUser,
-    errorValidator,
-    errorValidatorWrongType, getChecks, zodTypeMap,
-} from "./utilsRegisterTest";
+
 import {registerValidator} from "../../../../src/auth/type/validatorTypeRegister";
 import {
     IAuthValidationError
 } from "../../../../src/middleware/validation/validationSchemaBody";
 import {typeResponseRegisterSuccess} from "../../../../src/auth/type/registerDTO";
 import {authLimiterStore} from "../../../../src/RateLimiting/rate";
+import {createUser, errorValidator, errorValidatorWrongType, getChecks, zodTypeMap} from "../utilsAuthTest";
 
 let userRepository : Repository<User>
 
 beforeAll(async () => {
-    await setup()
+    //await setup()
     const myDataSource = getDataSource()
     userRepository = myDataSource.getRepository(User)
 
 })
 
-afterAll(async () => {
-    await teardown()
-})
+
 
 vi.mock("../../../../src/auth/service/userService.js", () => {
     const UserService = vi.fn(function() {
@@ -47,8 +41,6 @@ vi.mock("../../../../src/auth/service/userService.js", () => {
 
 
 
-describe("AUTH API CONTROLLER", () => {
-
     describe("POST register", () => {
 
         describe("Validator", () => {
@@ -59,8 +51,6 @@ describe("AUTH API CONTROLLER", () => {
                     .delete()
                     .from(User)
                     .execute()
-
-
             })
 
             it("request with undefined body", async () => {
@@ -268,5 +258,4 @@ describe("AUTH API CONTROLLER", () => {
 
 
     })
-})
 

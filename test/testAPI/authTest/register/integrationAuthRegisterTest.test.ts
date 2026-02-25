@@ -1,11 +1,9 @@
-import {describe, it, expect, beforeAll, afterAll,beforeEach} from "vitest"
+import {describe, it, expect, beforeAll,beforeEach} from "vitest"
 import {User} from "../../../../src/entities/postgres/user.entity";
 import {Repository} from "typeorm";
-import {setup, teardown} from "../../../setup";
 import {getDataSource} from "../../../../src/type/data-source/getDataSourceByEnv";
 import request from "supertest";
 import app from "../../../../src/app";
-import {createUser} from "./utilsRegisterTest";
 import * as argon2 from "argon2";
 import {getModelAI} from "../../../../src/AI/model";
 import {HumanMessage, SystemMessage} from "@langchain/core/messages";
@@ -13,25 +11,16 @@ import {registerAuth} from "../../../../src/auth/swagger/registerDefinition";
 import {SchemaAuthRegister} from "../../../../src/auth/swagger/registerSchema";
 import {z} from "zod";
 import {authLimiterStore} from "../../../../src/RateLimiting/rate";
+import {createUser} from "../utilsAuthTest";
 
 let userRepository : Repository<User>
 
 beforeAll(async () => {
-    await setup()
     const myDataSource = getDataSource()
     userRepository = myDataSource.getRepository(User)
 
 })
 
-afterAll(async () => {
-    await userRepository
-        .createQueryBuilder()
-        .delete()
-        .from(User)
-        .execute()
-
-    await teardown()
-})
 
 describe("AUTH API INTEGRATION", () => {
 
@@ -53,6 +42,8 @@ describe("AUTH API INTEGRATION", () => {
                 .post("/auth/register")
                 .send(user)
 
+            console.log("status ricevuto:", successResponse.status)
+            console.log("body:", successResponse.body)
 
             expect(successResponse.status).equal(201)
 
@@ -131,6 +122,9 @@ describeAI("AUTH API AI INTEGRATION", () => {
 
         for (const scenario of result.scenarios) {
             console.log(scenario.body, "----", scenario.description)
+
+            if (typeof scenario.body !== 'object' || scenario.body === null) continue
+
             const res = await request(app)
                 .post("/auth/register")
                 .send(scenario.body)

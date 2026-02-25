@@ -1,8 +1,8 @@
 import {describe, vi, it, expect} from "vitest"
-import {createUser} from "./utilsRegisterTest";
 import {UserService} from "../../../../src/auth/service/userService";
 import {User} from "../../../../src/entities/postgres/user.entity";
 import * as argon2 from "argon2";
+import {createUser} from "../utilsAuthTest";
 
 const mockRepository = {
     save: vi.fn().mockImplementation((user: User) => Promise.resolve(user)),
