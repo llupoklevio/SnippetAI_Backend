@@ -1,6 +1,5 @@
 import {Repository} from "typeorm";
 import {User} from "../../entities/postgres/user.entity.js";
-//import {UserSession} from "../../entities/postgres/userSession.js";
 import {typeLoginValidator} from "../type/validatorTypeLogin.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import * as argon2 from "argon2";
@@ -27,7 +26,6 @@ export class LoginService {
         if(!verifyPassword) throw new ErrorResponse("NOT_FOUND","BusinessLogic","user not found")
 
         /** password verificata */
-
         const payload = {
             idUser: user.id,
             email: dataToLogin.email,

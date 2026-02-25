@@ -14,8 +14,7 @@ import {UserSession} from "../../../../src/entities/postgres/userSession";
 import {typeResponseLoginAPI, typeResponseServiceLogin} from "../../../../src/auth/type/loginDTO";
 import {loginValidator} from "../../../../src/auth/type/validatorTypeLogin";
 import {IAuthValidationError} from "../../../../src/middleware/validation/validationSchemaBody";
-import {before} from "node:test";
-import {registerDTO, typeRegisterDTO} from "../../../../src/auth/type/registerDTO";
+import {typeRegisterDTO} from "../../../../src/auth/type/registerDTO";
 
 let userRepository : Repository<User>
 let userSessionRepository : Repository<UserSession>
