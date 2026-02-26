@@ -1,11 +1,11 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn, Relation} from "typeorm";
+import {Column, Entity, ManyToOne, PrimaryColumn, Relation} from "typeorm";
 import {User} from "./user.entity.js";
 
 @Entity()
 export class UserSession {
 
-    @PrimaryGeneratedColumn()
-    id!: number;
+    @PrimaryColumn("uuid")
+    id: string = crypto.randomUUID();
 
     @Column({type: "varchar", length: 255})
     refreshToken!: string;

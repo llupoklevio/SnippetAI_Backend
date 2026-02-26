@@ -118,7 +118,6 @@ describeAI("AUTH API AI INTEGRATION", () => {
         const result = await modelWithStructuredResponse.invoke(context)
 
         for (const scenario of result.scenarios) {
-            console.log(scenario.body, "----", scenario.description)
 
             if (typeof scenario.body !== 'object' || scenario.body === null) continue
 
@@ -126,7 +125,6 @@ describeAI("AUTH API AI INTEGRATION", () => {
                 .post("/auth/register")
                 .send(scenario.body)
 
-            console.log(res.body, res.status)
             /** Il server non crasha mai */
             expect(res.status).not.equal(500)
 
