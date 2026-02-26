@@ -37,7 +37,7 @@ export class LoginService {
         const refreshToken = jwt.sign(payload, process.env.SECRET_JWT!,{expiresIn: expiredRefreshTime})
 
         /** Calcoliamo scadenza per sessionUser */
-        const expiredToken = DateTime.now().plus({ minutes: expiredRefreshTime });
+        const expiredToken = DateTime.now().plus({ second: expiredRefreshTime });
 
         /** Popoliamo sessionUser */
         const userSession = new UserSession()
