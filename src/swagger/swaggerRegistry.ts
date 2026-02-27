@@ -2,6 +2,13 @@ import {OpenApiGeneratorV3, OpenAPIRegistry} from "@asteasolutions/zod-to-openap
 
 export const registry = new OpenAPIRegistry()
 
+registry.registerComponent('securitySchemes', 'bearerAuth', {
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
+    description: 'Inserisci il token JWT'
+});
+
 export const getSwaggerDoc = () => {
     const generator = new OpenApiGeneratorV3(registry.definitions)
     return generator.generateDocument({

@@ -1,10 +1,11 @@
 import {registry} from "../../swagger/swaggerRegistry.js";
-import {loginAuth, registerAuth} from "./registerDefinition.js";
+import {loginAuth, refreshAuth, registerAuth} from "./registerDefinition.js";
 import {AuthValidationBodyError} from "../../middleware/validation/validationSchemaBody.js";
 import {registerValidator} from "../type/validatorTypeRegister.js";
 import {error500, errorDB409, responseRegisterSuccess} from "../type/registerDTO.js";
 import {loginValidator} from "../type/validatorTypeLogin.js";
 import {errorNotFound, responseLoginAPI} from "../type/loginDTO.js";
+import {error400Refresh, errorNotFoundRefresh, responseRefreshAPI} from "../type/refreshDTO.js";
 
 export const SchemaAuthRegister = {
     Validator: registry.register(
@@ -73,5 +74,35 @@ registry.registerPath(
         validator: SchemaAuthLogin.Validator,
         error404:SchemaAuthLogin.ErrorNotFound,
         error500: SchemaAuthLogin.ServerError
+    })
+)
+
+export const SchemaAuthRefresh = {
+    Response: registry.register(
+        'responsePostRefresh',
+        responseRefreshAPI
+    ),
+    ErrorNotFound: registry.register(
+        'errorNotFoundRefresh',
+        errorNotFoundRefresh
+    ),
+    ErrorValidationToken: registry.register(
+      "errorValidationToken",
+        error400Refresh
+    ),
+    ServerError: registry.register(
+        'serverError',
+        error500
+    )
+}
+
+registry.registerPath(
+    refreshAuth({
+        path: "/auth/refresh",
+        summary: "api used to get a new access token",
+        response: SchemaAuthRefresh.Response,
+        error400: SchemaAuthRefresh.ErrorValidationToken,
+        error404: SchemaAuthRefresh.ErrorNotFound,
+        error500: SchemaAuthRefresh.ServerError
     })
 )

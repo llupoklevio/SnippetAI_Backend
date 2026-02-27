@@ -60,7 +60,7 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
                 message: err.message,
             })
         case "JWT_ERROR":
-            return res.status(500).json({
+            return res.status(400).json({
                 type: err.typeError,
                 message: err.message,
             })
