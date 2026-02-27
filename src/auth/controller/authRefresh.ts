@@ -13,7 +13,7 @@ export const refresh = async(req: RequestJWT, res: Response) => {
     console.log(authorization);
 
     if(!auth || !authorization){
-       throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT")
+       throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
     }
 
     req.log.info(`${req?.auth?.email} sta tentando di ricreare access token`)

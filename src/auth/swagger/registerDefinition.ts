@@ -55,3 +55,29 @@ export const loginAuth = ({path,summary,send,response,error500,error404,validato
         }
     }
 })
+
+export const refreshAuth = ({path, summary, response, error400, error404, error500} : IbaseStruct & {error400: any, error404: any}) => ({
+    method: "get" as const,
+    path: path,
+    tags: ['Auth'],
+    security: [{ bearerAuth: [] }],
+    summary: summary,
+    responses: {
+        200:{
+            description: "Successfully logged in",
+            content: {'application/json': {schema: response}}
+        },
+        400: {
+            description: "validation failed.",
+            content: {'application/json': {schema: error400}}
+        },
+        404: {
+            description: "user not founded",
+            content: {'application/json': {schema: error404}}
+        },
+        500: {
+            description: "Server Error",
+            content: {'application/json': {schema: error500}}
+        }
+    }
+})
