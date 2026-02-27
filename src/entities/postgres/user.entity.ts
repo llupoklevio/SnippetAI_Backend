@@ -20,7 +20,7 @@ export class User {
     @Column({type: "text"})
     password!:string;
 
-    @OneToMany(() => UserSession, (session) => session.user)
+    @OneToMany(() => UserSession, (session) => session.user, {cascade:["remove"]})
     session?: Relation<UserSession[]>;
 
 }

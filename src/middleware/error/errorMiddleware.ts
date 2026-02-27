@@ -59,6 +59,11 @@ export const CapturedErrorMiddleware = (err: ErrorResponse, _req: Request, res: 
                 type: err.typeError,
                 message: err.message,
             })
+        case "JWT_ERROR":
+            return res.status(500).json({
+                type: err.typeError,
+                message: err.message,
+            })
         default:
             next(err as any);
     }

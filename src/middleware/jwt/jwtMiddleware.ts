@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import {expressjwt} from "express-jwt"
 import {NextFunction, Request, Response} from "express"
 import {ErrorResponse} from "../error/ErrorResponse.js";
@@ -11,9 +13,17 @@ export const validateTJWT = expressjwt({
 export const jwtMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
     await validateTJWT(req, res, (err) => {
-        if(!err) next()
+        if(!err) return next()
 
-        return next(new ErrorResponse("JWT_ERROR","Token",`${err.message}`))
+        return next(new ErrorResponse("JWT_ERROR","BusinessLogic",`${err.message}`))
 
     })
+}
+
+export interface RequestJWT extends Request {
+    auth?: {
+        idUser: string,
+        email: string,
+    }
+
 }

@@ -2,8 +2,8 @@ import {IErrorResponse} from "./type/ErrorType.js";
 
 export class ErrorResponse extends Error implements IErrorResponse {
     constructor(
-        public code: string,
-        public typeError: string,
+        public code: "EMAIL_ALREADY_EXISTS" | "NOT_FOUND" | "JWT_ERROR",
+        public typeError: "BusinessLogic",
         message: string
     ) {
         super(message);
