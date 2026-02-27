@@ -10,7 +10,6 @@ export const refresh = async(req: RequestJWT, res: Response) => {
 
     const auth : RequestJWT["auth"] = req.auth
     const authorization = req?.headers?.authorization?.split(" ")[1]
-    console.log(authorization);
 
     if(!auth || !authorization){
        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
