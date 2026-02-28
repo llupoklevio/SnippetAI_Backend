@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "dev": "NODE_ENV=development nodemon --exec node --loader ts-node/esm src/server.ts",
+    "dev": "NODE_ENV=development nodemon --exec tsx src/server.ts",
     "build": "tsc",
     "start": "NODE_ENV=production node dist/server.js",
     "test:ui": "vitest  --ui",
@@ -28,6 +28,7 @@
     "@langchain/core": "^1.1.26",
     "@langchain/openai": "^1.2.8",
     "argon2": "^0.44.0",
+    "awilix": "^8.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",

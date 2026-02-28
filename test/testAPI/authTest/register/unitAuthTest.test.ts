@@ -12,21 +12,19 @@ import {
 import {typeResponseRegisterSuccess} from "../../../../src/auth/type/registerDTO";
 import {authLimiterStore} from "../../../../src/RateLimiting/rate";
 import {createUser, errorValidator, errorValidatorWrongType, getChecks, zodTypeMap} from "../utilsAuthTest";
+import {asValue} from "awilix";
+import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
+import {UserService} from "../../../../src/auth/service/userService";
 
 let userRepository : Repository<User>
 
 beforeAll(async () => {
-    //await setup()
     const myDataSource = getDataSource()
     userRepository = myDataSource.getRepository(User)
 
-})
-
-
-
-vi.mock("../../../../src/auth/service/userService.js", () => {
-    const UserService = vi.fn(function() {
-        return {
+    // sovrascrive l'istanza nel container
+    getContainer().register({
+        userService: asValue({
             registerUserDB: vi.fn().mockResolvedValue({
                 id: "123",
                 firstName: "tester",
@@ -34,10 +32,9 @@ vi.mock("../../../../src/auth/service/userService.js", () => {
                 email: "test@snippet.it",
                 password: "hashedpassword"
             })
-        };
-    });
-    return { UserService };
-});
+        } as unknown as UserService)
+    })
+})
 
 
 
@@ -51,6 +48,7 @@ vi.mock("../../../../src/auth/service/userService.js", () => {
                     .delete()
                     .from(User)
                     .execute()
+
             })
 
             it("request with undefined body", async () => {
@@ -231,7 +229,9 @@ vi.mock("../../../../src/auth/service/userService.js", () => {
 
         describe("Rate Limit", () => {
             it("personality rate for register max 10", async () => {
+
                 await authLimiterStore.resetAll()
+
                 for(let i=0; i<11; i++){
 
                     const user = createUser({
@@ -246,9 +246,11 @@ vi.mock("../../../../src/auth/service/userService.js", () => {
                         .send(user)
 
                     if(i==9){
+                        console.log(responseUser.body)
                         expect(responseUser.status).equal(201);
                     }
                     if(i==10){
+                        console.log(responseUser.body)
                         expect(responseUser.status).equal(429);
                     }
                 }

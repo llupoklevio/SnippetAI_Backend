@@ -6,12 +6,12 @@ import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 
 export class UserService {
     constructor(
-        private repository: Repository<User>
+        private userRepository: Repository<User>
     ) {}
 
     async registerUserDB(dataToRegister : IregisterValidator) : Promise<User> {
 
-        const user = await this.repository.findOneBy({
+        const user = await this.userRepository.findOneBy({
             email: dataToRegister.email
         })
         if (user) {
@@ -31,6 +31,6 @@ export class UserService {
         userToSave.email = dataToRegister.email;
         userToSave.password = passwordHashed
 
-        return await this.repository.save(userToSave)
+        return await this.userRepository.save(userToSave)
     }
 }

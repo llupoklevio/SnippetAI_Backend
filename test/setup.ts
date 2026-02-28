@@ -4,6 +4,7 @@ dotenv.config();
 import {DataSource} from "typeorm";
 import {closeConnection, instanceDataSource, isExistConnection, openConnection} from "../src/app-data-source.js";
 import {setDataSource} from "../src/type/data-source/getDataSourceByEnv";
+import {buildContainer} from "../src/ContainerAwilix/CompositionRoot";
 
 let myDataSource: DataSource | null = null;
 const mainDbNameTest = `${process.env.POSTGRES_TEST!}_${process.env.VITEST_WORKER_ID ?? "0"}`
@@ -32,6 +33,7 @@ export async function setup() {
 
         await tempConn.synchronize();
         setDataSource(myDataSource)
+        await buildContainer()
     }
 }
 
