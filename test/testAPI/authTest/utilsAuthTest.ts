@@ -1,5 +1,9 @@
 import {IregisterValidator, registerValidator} from "../../../src/auth/type/validatorTypeRegister";
 import {typeLoginValidator} from "../../../src/auth/type/validatorTypeLogin";
+import jwt from "jsonwebtoken"
+import {Express} from "express";
+import {ExpectStatic} from "vitest";
+import {typeResponseLoginAPI} from "../../../src/auth/type/loginDTO";
 
 export const errorValidator : IregisterValidator = {
     email: "",
@@ -78,4 +82,29 @@ export const errorValidatorWrongTypeLogin = {
 export const errorValidatorLogin : typeLoginValidator = {
     email: "",
     password:"" ,
+}
+
+/** ##### REFRESH ###### */
+export function getToken() : string  {
+    return "Bearer "+jwt.sign({
+        email: defaultUser.email,
+        id: 1
+    },process.env.SECRET_JWT!, {expiresIn: "1h"})
+}
+
+export const getTokenByLoggedUser = async (request: any, app: Express, expect: ExpectStatic) : Promise<typeResponseLoginAPI["session"]> => {
+
+    const register = await request(app)
+        .post("/auth/register")
+        .send(createUser({}))
+
+    expect(register.status).equal(201)
+
+    const login = await request(app)
+        .post("/auth/login")
+        .send(createUser({}))
+
+    expect(login.status).equal(200)
+
+    return login.body.session
 }
