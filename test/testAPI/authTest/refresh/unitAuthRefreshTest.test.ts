@@ -1,19 +1,19 @@
-import {describe, it, expect, vi} from "vitest"
+import {describe, it, expect, vi, beforeAll} from "vitest"
 import request from "supertest";
 import app from "../../../../src/app";
 import {getToken} from "../utilsAuthTest";
+import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
+import {asValue} from "awilix";
+import { RefreshService } from "../../../../src/auth/service/refreshService"
 
+const mockRefreshService = {
+    getAccessToken: vi.fn().mockResolvedValue("JWT_Token")
+}
 
-vi.mock("../../../../src/auth/service/refreshService.js", () => {
-    const RefreshService = vi.fn(function (){
-        return {
-            getAccessToken: vi.fn().mockResolvedValue(
-                "JWT_Token",
-            )
-        }
+beforeAll(() => {
+    getContainer().register({
+        refreshService: asValue(mockRefreshService as unknown as RefreshService)
     })
-
-    return {RefreshService}
 })
 
 describe('AUTH POST REFRESH', () => {
