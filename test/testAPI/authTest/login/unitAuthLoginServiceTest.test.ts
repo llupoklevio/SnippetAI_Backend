@@ -47,7 +47,7 @@ describe("AUTH API SERVICE", () => {
 
             const session = new LoginService(mockUserRepository as any, mockUserSessionRepository as any);
 
-            await expect(
+             expect(
                 session.LogUser({
                     password: "UserTest20",
                     email: "user@test.com"
@@ -65,7 +65,7 @@ describe("AUTH API SERVICE", () => {
             /** mock che la verifica della password sia falsa */
             (argon2.verify as any).mockResolvedValueOnce(false);
 
-            await expect(
+            expect(
                 session.LogUser({
                     password: "UserTest20",
                     email: "user@test.com"

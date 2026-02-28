@@ -29,8 +29,15 @@ export const error400Refresh = z.object({
         ]}),
     message: op(z.string(),{examples: [
             "Problem with JWT: see if you sending token",
+            "invalid token",
+            "invalid signature",
+            "jwt malformed",
+            "jwt must be provided",
+            "jwt expired",
+            "jwt not active"
         ]}),
 })
+
 
 
 export type typeResponseRefreshAPI = z.infer<typeof responseRefreshAPI>
