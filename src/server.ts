@@ -2,6 +2,7 @@ import app from "./app.js"
 import {instanceDataSource, isExistConnection} from "./app-data-source.js";
 import type {DataSource} from "typeorm";
 import {setDataSource} from "./type/data-source/getDataSourceByEnv.js";
+import {buildContainer} from "./ContainerAwilix/CompositionRoot.js";
 
 const schema = process.env.NODE_ENV === "development" ? process.env.SCHEMA_DEV! : process.env.SCHEMA_PROD!
 const db = process.env.POSTGRES_DB!
@@ -43,6 +44,10 @@ const main = async () => {
         setDataSource(datasource)
 
         console.log("Initializing...", datasource.options)
+
+        /** DI */
+        await buildContainer()
+
         /** Avvio software **/
         app.listen(process.env.PORT_SERVER)
 

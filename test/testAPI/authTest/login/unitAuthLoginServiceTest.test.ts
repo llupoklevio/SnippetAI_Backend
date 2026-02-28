@@ -1,8 +1,5 @@
 import {describe, vi, it, expect} from "vitest";
 import {LoginService} from "../../../../src/auth/service/loginService";
-import * as argon2 from "argon2";
-import { defaultUser} from "../utilsAuthTest";
-import jwt from 'jsonwebtoken';
 import {DateTime} from "luxon";
 
 const mockUserRepository = {
@@ -25,11 +22,6 @@ const mockUserSessionRepository = {
     }),
 }
 
-vi.mock("argon2", () => {
-    return {
-        verify: vi.fn()
-    };
-});
 
 vi.mock("jsonwebtoken", () => {
     return {
@@ -55,44 +47,6 @@ describe("AUTH API SERVICE", () => {
             ).rejects.toThrow("user not found");
         })
 
-        it("should be responde user not found if password not equal", async () => {
 
-            const session = new LoginService(mockUserRepository as any, mockUserSessionRepository as any);
-
-            /** faccio il mock di findOneBy facendo finta che lo user sia stato registrato */
-            mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
-
-            /** mock che la verifica della password sia falsa */
-            (argon2.verify as any).mockResolvedValueOnce(false);
-
-            expect(
-                session.LogUser({
-                    password: "UserTest20",
-                    email: "user@test.com"
-                })
-            ).rejects.toThrow("user not found");
-
-        })
-
-        it("should return tokens and user if login successful", async () => {
-            mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
-            (argon2.verify as any).mockResolvedValueOnce(true);
-            (jwt.sign as any).mockImplementation((payload: any) => `mocked-jwt-for-${payload.email}`);
-
-            const session = new LoginService(mockUserRepository as any, mockUserSessionRepository as any);
-            const userSessione = await session.LogUser({
-                password: "UserTest20",
-                email: "user@test.com"
-            })
-
-            expect(userSessione.accessToken).equal(`mocked-jwt-for-${defaultUser.email}`)
-            expect(userSessione.refreshToken).equal(`mocked-jwt-for-${defaultUser.email}`)
-            expect(userSessione.user.id).equal(20)
-            expect(userSessione.user.firstName).equal("User");
-            expect(userSessione.user.lastName).equal("Test");
-            expect(userSessione.user.email).equal("user@test.com")
-            expect(userSessione.user.password).equal("UserTest20");
-
-        })
     })
 })

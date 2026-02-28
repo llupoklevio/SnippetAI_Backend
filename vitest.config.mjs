@@ -6,5 +6,10 @@ export default defineConfig({
         environment: "node",
         include: ["test/testAPI/**/*/*.test.ts"],
         setupFiles: ["./test/startTest.ts"],
+        server: {
+            deps: {
+                inline: ["jsonwebtoken", /src\/.*/]
+            }
+        }
     }
 })

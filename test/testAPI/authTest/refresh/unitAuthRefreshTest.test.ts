@@ -4,7 +4,6 @@ import app from "../../../../src/app";
 import {getToken} from "../utilsAuthTest";
 
 
-
 vi.mock("../../../../src/auth/service/refreshService.js", () => {
     const RefreshService = vi.fn(function (){
         return {

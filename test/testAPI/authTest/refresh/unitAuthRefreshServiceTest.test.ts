@@ -3,6 +3,7 @@ import {RefreshService} from "../../../../src/auth/service/refreshService";
 import {defaultUser} from "../utilsAuthTest";
 import {UserSession} from "../../../../src/entities/postgres/userSession";
 import {DateTime} from "luxon";
+import jwt from "jsonwebtoken";
 
 const mockUserRepository = {
     findOneBy: vi.fn().mockResolvedValue(null),
@@ -12,11 +13,6 @@ const mockUserSessionRepository = {
     findOneBy: vi.fn().mockResolvedValue(null),
 }
 
-vi.mock("jsonwebtoken", () => ({
-    default: {
-        sign: vi.fn().mockReturnValue("token"),
-    }
-}))
 describe("AUTH API SERVICE", () => {
 
     describe("GET ACCESS TOKEN", () => {
@@ -70,6 +66,8 @@ describe("AUTH API SERVICE", () => {
         it("should return token", async () => {
             const access = new RefreshService(mockUserSessionRepository as any,mockUserRepository as any)
 
+            const signSpy = vi.spyOn(jwt, "sign").mockReturnValue("token" as any)
+
             mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
 
             mockUserSessionRepository.findOneBy.mockResolvedValueOnce({
@@ -85,6 +83,8 @@ describe("AUTH API SERVICE", () => {
             })
 
             expect(getToken).equal("token");
+
+            signSpy.mockRestore()
         })
     })
 })
