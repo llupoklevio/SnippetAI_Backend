@@ -11,7 +11,7 @@ export class LoginService {
 
     constructor(
      private userRepository: Repository<User>,
-     private userSessioneRepository: Repository<UserSession>,
+     private userSessionRepository: Repository<UserSession>,
     ){}
 
     async LogUser(dataToLogin : typeLoginValidator) {
@@ -45,7 +45,7 @@ export class LoginService {
         userSession.refreshToken = refreshToken;
         userSession.user = user
 
-        const userSessionSaved = await this.userSessioneRepository.save(userSession)
+        const userSessionSaved = await this.userSessionRepository.save(userSession)
 
         return {
             refreshToken: userSessionSaved.refreshToken,
