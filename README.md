@@ -24,37 +24,52 @@ Nel breve futuro si ha in programma di integrare BullMQ, architettura Event-Driv
 
 
 ## Teach Stack
-|  Layer             | Tecnologia |
-|--------------------|---|
-| Runtime            | Node.js v24 + TypeScript |
-| Framework          | Express 5 |
-| Database           | PostgreSQL 17 |
-| ORM                | TypeORM |
-| Autenticazione     | JWT (jsonwebtoken + express-jwt) |
-| Hashing password   | Argon2id |
-| Validazione        | Zod |
-| Documentazione API | Zod → OpenAPI (swagger-ui-express) |
-| Logging            | Pino + pino-http |
-| Rate Limiting      | express-rate-limit |
-| AI                 | LangChain + OpenAI GPT-4.1 |
-| Testing            | Vitest + Supertest |
-| Container          | Docker (multi-stage build) |
+| Layer                | Tecnologia                         |
+|----------------------|------------------------------------|
+| Runtime              | Node.js v24 + TypeScript           |
+| Framework            | Express 5                          |
+| Database             | PostgreSQL 17                      |
+| ORM                  | TypeORM                            |
+| Autenticazione       | JWT (jsonwebtoken + express-jwt)   |
+| Hashing password     | Argon2id                           |
+| Validazione          | Zod                                |
+| Documentazione API   | Zod → OpenAPI (swagger-ui-express) |
+| Logging              | Pino + pino-http                   |
+| Rate Limiting        | express-rate-limit                 |
+| AI                   | LangChain + OpenAI GPT-4.1         |
+| Testing              | Vitest + Supertest                 |
+| Container            | Docker (multi-stage build)         |
+| Dipendency Injection | Awilix                             | 
 
 ---
 
 ## Setup
+
+La modalità production è attualmente in sviluppo. Le migrazioni TypeORM non sono ancora state implementate. Il deploy in produzione è previsto nelle prossime versioni.
+
 ### Requisito
 - Docker
 
 ### .ENV
 
-    POSTGRES_USER= 
-    POSTGRES_PASSWORD= 
-    POSTGRES_DB=
-    OPENAI_API_KEY = 
-    USEAITEST=
+Crea un file `.env` nella root del progetto:
 
-Le env servono per le credenziali postgres e per usare openAI
+| Variabile | Descrizione | Esempio |
+|-----------|-------------|---------|
+| `PORT_SERVER` | Porta su cui gira il server | `3000` |
+| `POSTGRES_USER` | Utente PostgreSQL | `postgres` |
+| `POSTGRES_PASSWORD` | Password PostgreSQL | `password` |
+| `POSTGRES_PORT` | Porta PostgreSQL | `5433` |
+| `POSTGRES_HOST` | Host PostgreSQL | `localhost` |
+| `POSTGRES_DB` | Nome del database principale | `snippetai_Valutation` |
+| `SCHEMA_DEV` | Schema per l'ambiente di sviluppo | `snippetaidev` |
+| `SCHEMA_PROD` | Schema per l'ambiente di produzione | `snippetaiprod` |
+| `POSTGRES_TEST` | Nome del database per i test | `snippetaitest` |
+| `OPENAI_API_KEY` | Chiave API OpenAI (necessaria solo per `test:ai`) | `sk-...` |
+| `SECRET_JWT` | Secret per la firma dei JWT | `testSecret` |
+| `JWT_ACC_EXPIRES_MIN` | Durata in minuti dell'access token | `5` |
+| `JWT_REF_EXPIRES_MIN` | Durata in minuti del refresh token | `30` |
+| `USEAITEST` | Abilita i test con AI (`true`/`false`) | `false` |
 
 ## Avvio
 
@@ -70,15 +85,6 @@ npm install
 # Avvia il server in modalità sviluppo (hot reload)
 npm run dev
 ```
-
-### Produzione
-
-```bash
-npm run build
-npm run start
-```
-
----
 
 ### Documentazione
 
