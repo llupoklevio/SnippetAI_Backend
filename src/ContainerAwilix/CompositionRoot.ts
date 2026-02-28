@@ -29,9 +29,9 @@ export async function buildContainer() {
         userRepository: asClass(AuthUserRepository).singleton(),
         userSessionRepository: asClass(AuthUserSessionRepository).singleton(),
 
-        userService: asClass(UserService).singleton(),
-        loginService: asClass(LoginService).singleton(),
-        refreshService: asClass(RefreshService).singleton(),
+        userService: asClass(UserService).scoped(),
+        loginService: asClass(LoginService).scoped(),
+        refreshService: asClass(RefreshService).scoped(),
     })
 
     return _container;
