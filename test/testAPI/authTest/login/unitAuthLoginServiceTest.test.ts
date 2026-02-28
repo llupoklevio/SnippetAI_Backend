@@ -3,7 +3,7 @@ import {LoginService} from "../../../../src/auth/service/loginService";
 import {DateTime} from "luxon";
 
 const mockUserRepository = {
-    findOneBy: vi.fn().mockResolvedValue(null),
+    findOneByEmail: vi.fn().mockResolvedValue(null),
 }
 
 const mockUserSessionRepository = {

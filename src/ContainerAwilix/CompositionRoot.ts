@@ -1,33 +1,33 @@
 import {asClass, asValue, AwilixContainer, createContainer, InjectionMode} from "awilix";
-import {getDataSource} from "../type/data-source/getDataSourceByEnv.js";
-import {User} from "../entities/postgres/user.entity.js";
-import {UserSession} from "../entities/postgres/userSession.js";
 import {UserService} from "../auth/service/userService.js";
 import {LoginService} from "../auth/service/loginService.js";
 import {RefreshService} from "../auth/service/refreshService.js";
-import {Repository} from "typeorm";
+import {AuthUserRepository} from "../auth/repositoryTypeORM/AuthUserRepository.js";
+import {AuthUserSessionRepository} from "../auth/repositoryTypeORM/AuthUserSessionRepository.js";
+import {DataSource} from "typeorm";
+import {getDataSource} from "../type/data-source/getDataSourceByEnv.js";
 
 let _container: AwilixContainer<Definitions> | null = null;
 
 interface Definitions {
-    userRepository: Repository<User>;
-    userSessionRepository: Repository<UserSession>;
+    dataSource: DataSource;
+    userRepository: AuthUserRepository;
+    userSessionRepository: AuthUserSessionRepository;
     userService: UserService;
     loginService: LoginService;
     refreshService: RefreshService;
 }
-
 export async function buildContainer() {
-
-    const dataSource = getDataSource();
 
     _container = createContainer<Definitions>({
         injectionMode: InjectionMode.CLASSIC,
     })
 
     _container.register({
-        userRepository: asValue(dataSource.getRepository(User)),
-        userSessionRepository: asValue(dataSource.getRepository(UserSession)),
+        dataSource: asValue(getDataSource()),
+
+        userRepository: asClass(AuthUserRepository).singleton(),
+        userSessionRepository: asClass(AuthUserSessionRepository).singleton(),
 
         userService: asClass(UserService).singleton(),
         loginService: asClass(LoginService).singleton(),

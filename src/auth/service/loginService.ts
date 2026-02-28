@@ -1,24 +1,22 @@
-import {Repository} from "typeorm";
-import {User} from "../../entities/postgres/user.entity.js";
 import {typeLoginValidator} from "../type/validatorTypeLogin.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import * as argon2 from "argon2";
 import jwt from 'jsonwebtoken';
 import {DateTime} from "luxon";
 import {UserSession} from "../../entities/postgres/userSession.js";
+import {IAuthUserRepository} from "../repositoryTypeORM/interface/IauthUserRepository.js";
+import {IAuthUserSessionRepository} from "../repositoryTypeORM/interface/IauthUserSessionRepository.js";
 
 export class LoginService {
 
     constructor(
-     private userRepository: Repository<User>,
-     private userSessionRepository: Repository<UserSession>,
+     private userRepository: IAuthUserRepository,
+     private userSessionRepository: IAuthUserSessionRepository,
     ){}
 
     async LogUser(dataToLogin : typeLoginValidator) {
 
-        const user = await this.userRepository.findOneBy({
-            email: dataToLogin.email,
-        })
+        const user = await this.userRepository.findOneByEmail(dataToLogin.email)
         if(!user) throw new ErrorResponse("NOT_FOUND","BusinessLogic","user not found")
 
         /** user esiste, ma va verifica la password */

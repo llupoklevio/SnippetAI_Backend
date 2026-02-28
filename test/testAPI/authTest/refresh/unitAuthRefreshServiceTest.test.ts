@@ -6,11 +6,11 @@ import {DateTime} from "luxon";
 import jwt from "jsonwebtoken";
 
 const mockUserRepository = {
-    findOneBy: vi.fn().mockResolvedValue(null),
+    findByEmailAndId: vi.fn().mockResolvedValue(null),
 }
 
 const mockUserSessionRepository = {
-    findOneBy: vi.fn().mockResolvedValue(null),
+    findByRefreshToken: vi.fn().mockResolvedValue(null),
 }
 
 describe("AUTH API SERVICE", () => {
@@ -32,7 +32,7 @@ describe("AUTH API SERVICE", () => {
 
             const access = new RefreshService(mockUserSessionRepository as any,mockUserRepository as any)
 
-            mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
+            mockUserRepository.findByEmailAndId.mockResolvedValueOnce(defaultUser);
 
             expect(
                 access.getAccessToken("Token", {
@@ -46,9 +46,9 @@ describe("AUTH API SERVICE", () => {
 
             const access = new RefreshService(mockUserSessionRepository as any,mockUserRepository as any)
 
-            mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
+            mockUserRepository.findByEmailAndId.mockResolvedValueOnce(defaultUser);
 
-            mockUserSessionRepository.findOneBy.mockResolvedValueOnce({
+            mockUserSessionRepository.findByRefreshToken.mockResolvedValueOnce({
                 user: defaultUser,
                 expiresAt: DateTime.now().minus({day:1}).toJSDate(),
                 refreshToken: "token",
@@ -68,9 +68,9 @@ describe("AUTH API SERVICE", () => {
 
             const signSpy = vi.spyOn(jwt, "sign").mockReturnValue("token" as any)
 
-            mockUserRepository.findOneBy.mockResolvedValueOnce(defaultUser);
+            mockUserRepository.findByEmailAndId.mockResolvedValueOnce(defaultUser);
 
-            mockUserSessionRepository.findOneBy.mockResolvedValueOnce({
+            mockUserSessionRepository.findByRefreshToken.mockResolvedValueOnce({
                 user: defaultUser,
                 expiresAt: DateTime.now().plus({day:1}).toJSDate(),
                 refreshToken: "token",

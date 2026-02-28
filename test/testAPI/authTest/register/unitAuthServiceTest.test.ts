@@ -6,8 +6,8 @@ import {createUser} from "../utilsAuthTest";
 
 const mockRepository = {
     save: vi.fn().mockImplementation((user: User) => Promise.resolve(user)),
-    findOneBy: vi.fn().mockResolvedValue(null),
-};
+    findOneByEmail: vi.fn().mockResolvedValue(null),
+}
 
 
 describe("AUTH API SERVICE", () => {

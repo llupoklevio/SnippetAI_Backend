@@ -1,19 +1,17 @@
-import {Repository} from "typeorm";
 import {User} from "../../entities/postgres/user.entity.js";
 import {IregisterValidator} from "../type/validatorTypeRegister.js";
 import * as argon2 from "argon2";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
+import {IAuthUserRepository} from "../repositoryTypeORM/interface/IauthUserRepository.js";
 
 export class UserService {
     constructor(
-        private userRepository: Repository<User>
+        private userRepository: IAuthUserRepository
     ) {}
 
     async registerUserDB(dataToRegister : IregisterValidator) : Promise<User> {
 
-        const user = await this.userRepository.findOneBy({
-            email: dataToRegister.email
-        })
+        const user = await this.userRepository.findOneByEmail(dataToRegister.email)
         if (user) {
             throw new ErrorResponse("EMAIL_ALREADY_EXISTS", "BusinessLogic", "L'email è già registrata");
         }
