@@ -9,7 +9,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    environment: production
+    environment: perpetual-analysis / production
 
     services:
       postgres:
