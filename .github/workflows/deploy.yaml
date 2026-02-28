@@ -12,15 +12,15 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:18.2-alpine
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: snippetaitest
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d snippetaitest"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
