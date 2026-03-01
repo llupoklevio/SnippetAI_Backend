@@ -51,7 +51,7 @@ const closeConnection  = async (dbName: string, dataSource: DataSource) => {
 
 }
 
-const instanceDataSource = ({dbName,serverName, synchronize, database} : IConnectionType) : DataSource => {
+const instanceDataSource = ({dbName,serverName, synchronize, database, migrationsSetup} : IConnectionType) : DataSource => {
 
     const instance = new DataSource({
         type: serverName,
@@ -59,7 +59,8 @@ const instanceDataSource = ({dbName,serverName, synchronize, database} : IConnec
         entities: getEntities(serverName),
         schema: dbName,
         database: database,
-        ...getServer(serverName)
+        ...getServer(serverName),
+        ...migrationsSetup
     } as DataSourceOptions)
 
     if(instance === undefined || instance === null) {
