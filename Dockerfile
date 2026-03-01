@@ -22,6 +22,7 @@ COPY tsconfig*.json ./
 RUN npm ci
 
 COPY ./src ./src
+COPY entrypoint.sh ./
 
 RUN npm run build
 
@@ -39,4 +40,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
 
-CMD ["node", "dist/server.js"]
+COPY --from=build /app/entrypoint.sh ./
+
+RUN chmod +x entrypoint.sh
+CMD ["sh", "entrypoint.sh"]
