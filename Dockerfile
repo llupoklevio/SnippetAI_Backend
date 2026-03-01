@@ -34,6 +34,7 @@ WORKDIR /app
 
 COPY --from=build /app/entrypoint.sh ./
 RUN chmod +x entrypoint.sh
+RUN mkdir -p /app/dist/migrations
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN chown -R appuser:appgroup /app
