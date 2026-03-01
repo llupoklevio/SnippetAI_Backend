@@ -33,6 +33,8 @@ app.use(pinoHttp({
 /** Per leggere il req.body **/
 app.use(express.json())
 
+app.set('trust proxy', 1);
+
 /** Cors
  *
  * Non si ha ancora un host per fe
