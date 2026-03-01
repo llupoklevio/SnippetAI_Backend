@@ -18,7 +18,11 @@ Lo scopo del progetto è dimostrare le mie capacità: non solo dal punto di vist
 (come la Dependency Injection per separare la dipendenza tra repository e controller/service), della scalabilità e dell'integrazione di nuove librerie.
 Una mentalità maturata attraverso il percorso universitario e la mia esperienza nel mondo lavorativo.
 
-Nel breve futuro si ha in programma di integrare BullMQ, architettura Event-Driven e ambiente Cloud
+01-02-26
+
+Sono state implementate le migrazioni per l'ambiente produzione, integrata CI/CD per ambiente prod su Railway, e reso disponibile tramite docker-compose l'ambiente dev con test
+
+Nel breve futuro si ha in programma di integrare BullMQ, architettura Event-Driven e ambiente Cloud AWS
 
 ---
 
@@ -45,7 +49,8 @@ Nel breve futuro si ha in programma di integrare BullMQ, architettura Event-Driv
 
 ## Setup
 
-La modalità production è attualmente in sviluppo. Le migrazioni TypeORM non sono ancora state implementate. Il deploy in produzione è previsto nelle prossime versioni.
+Ci sono 2 docker-compose: uno per avviare in produzione , e l'altro per avviarlo in dev con i test, 
+In dev si usa synchronized mentre in produzione si usano le migrazioni
 
 ### Requisito
 - Docker
