@@ -10,7 +10,7 @@
     "start": "NODE_ENV=production node dist/server.js",
     "test:ui": "vitest  --ui",
     "test:ai": "AI_TESTS=true vitest",
-    "migration:generate": "npx typeorm migration:generate dist/migrations/InitialSchema -d dist/data-source.cli.js",
+    "migration:generate": "npx typeorm migration:generate dist/migrations/InitialSchema -d dist/data-source.cli.js --outputJs",
     "migration:run": "npx typeorm migration:run -d dist/data-source.cli.js",
     "migration:revert": "npx typeorm migration:revert -d dist/data-source.cli.js"
   },
