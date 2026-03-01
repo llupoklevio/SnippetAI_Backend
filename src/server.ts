@@ -21,6 +21,9 @@ const main = async () => {
                 dbName: schema,
                 synchronize: false,
                 database: db,
+                migrationsSetup: {
+                    migrations: ["dist/migrations/*.js"]
+                }
             })
         }else{
             console.log("Is not expected to have an open connection")
@@ -38,7 +41,12 @@ const main = async () => {
             await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
 
             await tempConn.synchronize();
-            console.log(`✅ Database pronto sullo schema: ${schemaFullName}`);
+            console.log(`Database pronto sullo schema: ${schemaFullName}`);
+        }else if(process.env.NODE_ENV === "production"){
+            await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schema}";`);
+            await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+            await tempConn.runMigrations();
+            console.log(`Migrazioni eseguite`);
         }
 
         setDataSource(datasource)

@@ -20,7 +20,9 @@ export class UserService {
         /** Hashing per salvare la password hashata nel DB */
         const passwordHashed = await argon2.hash(dataToRegister.password, {
             type: argon2.argon2id,
-            parallelism: 1
+            parallelism: 1,
+            timeCost: 3,
+            memoryCost: 4096
         })
 
         const userToSave : User = new User()
