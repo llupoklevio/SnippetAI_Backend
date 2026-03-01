@@ -50,7 +50,7 @@ app.use(limiter)
 
 /** Swagger attraverso la libreria Zod **/
 const swaggerDocument = getSwaggerDoc()
-// if(process.env.NODE_ENV !== "production")
+if(process.env.NODE_ENV !== "production")
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /** Routes **/

@@ -13,4 +13,5 @@ export const setupModelAI = async () => {
     }
 }
 
+// TODO aggiungere controllo errore dato il mancato await nel app
 export const getModelAI = () => _model
