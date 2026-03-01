@@ -1,3 +1,17 @@
+FROM node:24-alpine AS dev
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY tsconfig*.json ./
+
+RUN npm install
+
+COPY ./src ./src
+COPY ./test ./test
+
+CMD ["npm","run", "dev"]
+
 FROM node:24-alpine AS build
 
 WORKDIR /app
