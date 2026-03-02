@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development nodemon --exec tsx src/server.ts",
     "build": "tsc",
     "start": "NODE_ENV=production node dist/server.js",
-    "test:ui": "vitest  --ui",
+    "test:ui": "vitest --ui",
     "test:ai": "AI_TESTS=true vitest",
     "migration:generate": "npx typeorm-ts-node-esm migration:generate src/migrations/InitialSchema -d src/data-source.cli.ts",
     "migration:run": "npx typeorm-ts-node-esm migration:run -d src/data-source.cli.ts",
