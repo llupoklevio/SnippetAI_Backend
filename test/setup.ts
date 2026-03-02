@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: ".env.test" });
 import {DataSource} from "typeorm";
 import {closeConnection, instanceDataSource, isExistConnection, openConnection} from "../src/app-data-source.js";
 import {setDataSource} from "../src/type/data-source/getDataSourceByEnv";
