@@ -144,8 +144,6 @@ describe("AUTH API LOGIN INTEGRATION", () => {
 
             expect([200, 201, 400, 409].includes(res.status)).equal(true)
 
-            console.log(result)
-
         }
     },30_000)
 })
