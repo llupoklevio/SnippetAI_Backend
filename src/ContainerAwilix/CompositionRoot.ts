@@ -8,6 +8,11 @@ import {DataSource} from "typeorm";
 import {getDataSource} from "../type/data-source/getDataSourceByEnv.js";
 import {SnippetRepository} from "../snippet/repositoryTypeORM/snippetRepository.js";
 import {SnippetService} from "../snippet/service/snippetService.js";
+import {ConnectionOptions} from "bullmq";
+import {redisConnection} from "../redisConnection.js";
+import {RAGSnippetQueue} from "../bullMQ/RAGSnippetQueue.js";
+import {RAGWorker} from "../bullMQ/RAGWorker.js";
+import {Namespace} from "socket.io";
 
 let _container: AwilixContainer<Definitions> | null = null;
 
@@ -24,6 +29,17 @@ interface Definitions {
     /** Snippet */
     snippetRepository: SnippetRepository
     snippetService: SnippetService
+
+    /** Redis */
+    redisConnection: ConnectionOptions;
+
+    /** Queue */
+    RAGSnippetQueue: RAGSnippetQueue<unknown>
+    /** Worker */
+    RAGWorker: RAGWorker<unknown>
+
+    /** Socket */
+    snippetIO: Namespace
 }
 export async function buildContainer() {
 
@@ -46,6 +62,14 @@ export async function buildContainer() {
         snippetRepository: asClass(SnippetRepository).singleton(),
 
         snippetService: asClass(SnippetService).scoped(),
+
+        /** Redis */
+        redisConnection: asValue(redisConnection),
+
+        /** Queue */
+        RAGSnippetQueue: asClass(RAGSnippetQueue).singleton(),
+        /** Worker */
+        RAGWorker: asClass(RAGWorker).singleton()
     })
 
     return _container;
