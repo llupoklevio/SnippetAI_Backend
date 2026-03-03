@@ -45,7 +45,7 @@ app.use(cors({
 }));
 
 /** AI */
-void setupModelAI();
+await setupModelAI();
 
 /** rateLimit */
 app.use(limiter)
