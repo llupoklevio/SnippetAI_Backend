@@ -1,4 +1,5 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {User} from "./user.entity.js";
 
 @Entity()
 export class Snippet {
@@ -12,12 +13,15 @@ export class Snippet {
     @Column({type: 'text'})
     code!: string
 
-    @Column({type: 'varchar', length: 255})
-    description!: string;
+    @Column({type: 'varchar', length: 255, nullable: true})
+    description?: string;
 
     @CreateDateColumn({ type: "timestamp" })
     dateCreation!: Date;
 
     @UpdateDateColumn({ type: "timestamp" })
     dateUpdate!: Date;
+
+    @ManyToOne(() => User, (user) => user.personalSnippets)
+    snippetOwner!: User;
 }

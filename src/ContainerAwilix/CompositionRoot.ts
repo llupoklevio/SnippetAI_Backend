@@ -6,16 +6,24 @@ import {AuthUserRepository} from "../auth/repositoryTypeORM/AuthUserRepository.j
 import {AuthUserSessionRepository} from "../auth/repositoryTypeORM/AuthUserSessionRepository.js";
 import {DataSource} from "typeorm";
 import {getDataSource} from "../type/data-source/getDataSourceByEnv.js";
+import {SnippetRepository} from "../snippet/repositoryTypeORM/snippetRepository.js";
+import {SnippetService} from "../snippet/service/snippetService.js";
 
 let _container: AwilixContainer<Definitions> | null = null;
 
 interface Definitions {
     dataSource: DataSource;
+
+    /** Auth */
     userRepository: AuthUserRepository;
     userSessionRepository: AuthUserSessionRepository;
     userService: UserService;
     loginService: LoginService;
     refreshService: RefreshService;
+
+    /** Snippet */
+    snippetRepository: SnippetRepository
+    snippetService: SnippetService
 }
 export async function buildContainer() {
 
@@ -26,12 +34,18 @@ export async function buildContainer() {
     _container.register({
         dataSource: asValue(getDataSource()),
 
+        /** Auth */
         userRepository: asClass(AuthUserRepository).singleton(),
         userSessionRepository: asClass(AuthUserSessionRepository).singleton(),
 
         userService: asClass(UserService).scoped(),
         loginService: asClass(LoginService).scoped(),
         refreshService: asClass(RefreshService).scoped(),
+
+        /** Snippet */
+        snippetRepository: asClass(SnippetRepository).singleton(),
+
+        snippetService: asClass(SnippetService).scoped(),
     })
 
     return _container;

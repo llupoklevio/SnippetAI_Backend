@@ -1,5 +1,6 @@
 import {Column, Entity, OneToMany, PrimaryColumn, Relation, Unique} from "typeorm";
 import {UserSession} from "./userSession.js";
+import {Snippet} from "./snippet.entity.js";
 
 @Entity()
 @Unique(["email"])
@@ -23,4 +24,6 @@ export class User {
     @OneToMany(() => UserSession, (session) => session.user, {cascade:["remove"]})
     session?: Relation<UserSession[]>;
 
+    @OneToMany(() => Snippet, (snippet) =>  snippet.snippeOwner)
+    personalSnippets?: Relation<Snippet[]>
 }
