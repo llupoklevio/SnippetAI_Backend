@@ -4,12 +4,15 @@ import {RequestJWT} from "../../middleware/jwt/jwtMiddleware.js";
 import {IAuthUserRepository} from "../../auth/repositoryTypeORM/interface/IauthUserRepository.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
+import {QueueBase} from "../../bullMQ/base/queueBase.js";
+
 
 
 export class SnippetService {
     constructor(
         private snippetRepository: ISnippetRepository,
-        private userRepository: IAuthUserRepository
+        private userRepository: IAuthUserRepository,
+        private RAGSnippetQueue: QueueBase<Snippet>
     ) {}
 
     async createSnippet(snippet : typeCreateSnippetValidator, auth: RequestJWT["auth"] ) {
@@ -28,12 +31,15 @@ export class SnippetService {
         const snippetToCreate = new Snippet()
         Object.assign(snippetToCreate,snippet)
 
+        const snippetSaved = await this.snippetRepository.save(snippetToCreate)
+        console.log(snippetSaved)
         /** snipped created
          *
          * Inizio RAG
          *
          * */
 
+        await this.RAGSnippetQueue.add("create_RAG",snippetToCreate)
         
     }
 }

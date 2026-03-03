@@ -4,7 +4,7 @@ import {getContainer} from "../../ContainerAwilix/CompositionRoot.js";
 import {typeCreateSnippetValidator} from "../type/validatorPostSnippet.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 
-export const postSnippet = async (req: RequestJWT, res: Response) => {
+export const postSnippet = async (req: RequestJWT, _res: Response) => {
 
     /** validator verificated
      *

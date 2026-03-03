@@ -2,7 +2,10 @@ import app from "./app.js"
 import {instanceDataSource, isExistConnection} from "./app-data-source.js";
 import type {DataSource} from "typeorm";
 import {setDataSource} from "./type/data-source/getDataSourceByEnv.js";
-import {buildContainer} from "./ContainerAwilix/CompositionRoot.js";
+import {buildContainer, getContainer} from "./ContainerAwilix/CompositionRoot.js";
+import {Server} from "socket.io"
+import {socketSnippetIO} from "./socket_IO/snippet.js";
+import {asValue} from "awilix";
 
 const schema = process.env.NODE_ENV === "development" ? process.env.SCHEMA_DEV! : process.env.SCHEMA_PROD!
 const db = process.env.POSTGRES_DB!
@@ -56,8 +59,19 @@ const main = async () => {
         /** DI */
         await buildContainer()
 
-        /** Avvio software **/
-        app.listen(process.env.PORT_SERVER)
+        /**
+         * Avvio software
+         * Avvio socket
+         * **/
+        const startServer = app.listen(process.env.PORT_SERVER)
+        const io = new Server(startServer, {
+            cors: { origin: "*"}
+        });
+        socketSnippetIO(io)
+
+        getContainer().register({
+            snippetIO: asValue(socketSnippetIO(io))
+        })
 
         console.log("Server is running on port: " + process.env.PORT_SERVER)
 
