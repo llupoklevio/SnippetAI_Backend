@@ -1,20 +1,33 @@
-import {Response,Request} from "express";
-import {SnippetService} from "../service/snippetService.js";
-import {getDataSource} from "../../type/data-source/getDataSourceByEnv.js";
-import {Snippet} from "../../entities/postgres/snippet.entity.js";
+import {Response} from "express";
+import {RequestJWT} from "../../middleware/jwt/jwtMiddleware.js";
+import {getContainer} from "../../ContainerAwilix/CompositionRoot.js";
+import {typeCreateSnippetValidator} from "../type/validatorPostSnippet.js";
+import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 
+export const postSnippet = async (req: RequestJWT, res: Response) => {
 
-export const postSnippet = async (_req: Request, res: Response) => {
+    /** validator verificated
+     *
+     * verificata title: lunghezza minima di 1 richiesta
+     * verificata code: lunghezza minima di 1 richiesta
+     * verificata description: opzionale, e lunghezza di minimo 20 richiesta
+     *
+     * **/
 
-    const CreateSnippet = new SnippetService(getDataSource().getRepository(Snippet));
+    const email = req.auth?.email
+    const idUser = req.auth?.idUser
 
-    await CreateSnippet.createSnippet({
-        code: "g",
-        title: "g",
-        description: "g",
-    })
+    if(!email || !idUser){
+        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
+    }
 
-    res.json({
-        message: "ok"
-    })
+    /** prendo i dati dal validator */
+    const SnippetToSave: typeCreateSnippetValidator = (req as any).validDataBody
+
+    req.log.info(`${email} sta tentando di scrivere uno snippet`)
+
+    /** chiamo il service per il business logic */
+    const { snippetService } = getContainer().cradle
+    await snippetService.createSnippet(SnippetToSave, {email, idUser} as RequestJWT["auth"])
+
 }

@@ -34,17 +34,17 @@ const main = async () => {
 
         /** Avvio connessione con db **/
         if (process.env.NODE_ENV !== "production") {
-            const schemaFullName = schema;
 
-            await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schemaFullName}";`);
-            await tempConn.query(`SET search_path TO "${schemaFullName}";`);
+            await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schema}";`);
+            await tempConn.query(`SET search_path TO "${schema}";`);
             await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
 
             await tempConn.synchronize();
-            console.log(`Database pronto sullo schema: ${schemaFullName}`);
+            console.log(`Database pronto sullo schema: ${schema}`);
         }else if(process.env.NODE_ENV === "production"){
             await tempConn.query(`CREATE SCHEMA IF NOT EXISTS "${schema}";`);
             await tempConn.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+
             await tempConn.runMigrations();
             console.log(`Migrazioni eseguite`);
         }
