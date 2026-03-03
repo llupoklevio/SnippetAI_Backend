@@ -73,6 +73,9 @@ const main = async () => {
             snippetIO: asValue(socketSnippetIO(io))
         })
 
+        getContainer().cradle.RAGWorker
+
+
         console.log("Server is running on port: " + process.env.PORT_SERVER)
 
     }catch(err){

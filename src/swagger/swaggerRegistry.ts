@@ -22,6 +22,10 @@ export const getSwaggerDoc = () => {
             {
                 name: 'Auth',
                 description: 'Gestione autenticazione utenti',
+            },
+            {
+                name: 'Snippet',
+                description: 'Gestione snippet utenti',
             }
         ]
     })
