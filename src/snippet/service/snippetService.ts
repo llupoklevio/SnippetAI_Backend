@@ -6,8 +6,6 @@ import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
 import {QueueBase} from "../../bullMQ/base/queueBase.js";
 
-
-
 export class SnippetService {
     constructor(
         private snippetRepository: ISnippetRepository,
@@ -29,6 +27,7 @@ export class SnippetService {
          * */
 
         const snippetToCreate = new Snippet()
+        snippetToCreate.snippetOwner = user
         Object.assign(snippetToCreate,snippet)
 
         const snippetSaved = await this.snippetRepository.save(snippetToCreate)

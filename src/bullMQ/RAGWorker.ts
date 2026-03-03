@@ -9,7 +9,8 @@ export class RAGWorker<T> extends WorkerBase<T> {
         super("RAGSnippetQueue",redisConnection);
     }
 
-    async operation(_job: Job<T>): Promise<T> {
+    async operation(job: Job<T>): Promise<T> {
+        console.log("Job", job);
         return Promise.resolve(undefined as unknown as T);
     }
 }

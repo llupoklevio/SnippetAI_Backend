@@ -9,7 +9,7 @@ import {getDataSource} from "../type/data-source/getDataSourceByEnv.js";
 import {SnippetRepository} from "../snippet/repositoryTypeORM/snippetRepository.js";
 import {SnippetService} from "../snippet/service/snippetService.js";
 import {ConnectionOptions} from "bullmq";
-import {redisConnection} from "../redisConnection.js";
+import {getRedisConnection} from "../redisConnection.js";
 import {RAGSnippetQueue} from "../bullMQ/RAGSnippetQueue.js";
 import {RAGWorker} from "../bullMQ/RAGWorker.js";
 import {Namespace} from "socket.io";
@@ -64,10 +64,11 @@ export async function buildContainer() {
         snippetService: asClass(SnippetService).scoped(),
 
         /** Redis */
-        redisConnection: asValue(redisConnection),
+        redisConnection: asValue(getRedisConnection()),
 
         /** Queue */
         RAGSnippetQueue: asClass(RAGSnippetQueue).singleton(),
+
         /** Worker */
         RAGWorker: asClass(RAGWorker).singleton()
     })
