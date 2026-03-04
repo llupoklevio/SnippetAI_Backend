@@ -74,6 +74,7 @@ const main = async () => {
         })
 
         getContainer().cradle.RAGWorker
+        getContainer().cradle.DescriptionAIWorker
 
 
         console.log("Server is running on port: " + process.env.PORT_SERVER)

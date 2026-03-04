@@ -13,6 +13,8 @@ import {getRedisConnection} from "../redisConnection.js";
 import {RAGSnippetQueue} from "../bullMQ/RAGSnippetQueue.js";
 import {RAGWorker} from "../bullMQ/RAGWorker.js";
 import {Namespace} from "socket.io";
+import {DescriptionAIQueue} from "../bullMQ/DescriptionAIQueue.js";
+import {DescriptionAIWorker} from "../bullMQ/DescriptionAIWorker.js";
 
 let _container: AwilixContainer<Definitions> | null = null;
 
@@ -35,11 +37,15 @@ interface Definitions {
 
     /** Queue */
     RAGSnippetQueue: RAGSnippetQueue<unknown>
+    DescriptionAIQueue: DescriptionAIQueue<unknown>
+
     /** Worker */
-    RAGWorker: RAGWorker<unknown>
+    RAGWorker: RAGWorker
+    DescriptionAIWorker: DescriptionAIWorker
 
     /** Socket */
     snippetIO: Namespace
+
 }
 export async function buildContainer() {
 
@@ -68,9 +74,12 @@ export async function buildContainer() {
 
         /** Queue */
         RAGSnippetQueue: asClass(RAGSnippetQueue).singleton(),
+        DescriptionAIQueue: asClass(DescriptionAIQueue).singleton(),
 
         /** Worker */
-        RAGWorker: asClass(RAGWorker).singleton()
+        RAGWorker: asClass(RAGWorker).singleton(),
+        DescriptionAIWorker: asClass(DescriptionAIWorker).singleton()
+
     })
 
     return _container;
