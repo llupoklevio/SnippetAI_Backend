@@ -13,5 +13,7 @@ export const setupModelAI = async () => {
     }
 }
 
-// TODO aggiungere controllo errore dato il mancato await nel app
-export const getModelAI = () => _model
+export const getModelAI = () => {
+    if(!_model) throw new Error("No model found");
+    return _model;
+}
