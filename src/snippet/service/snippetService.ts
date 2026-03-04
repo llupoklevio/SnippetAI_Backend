@@ -5,12 +5,14 @@ import {IAuthUserRepository} from "../../auth/repositoryTypeORM/interface/IauthU
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
 import {QueueBase} from "../../bullMQ/base/queueBase.js";
+import {TypeForDescriptionAIWorker} from "../type/responseSnippet.js";
 
 export class SnippetService {
     constructor(
         private snippetRepository: ISnippetRepository,
         private userRepository: IAuthUserRepository,
-        private RAGSnippetQueue: QueueBase<Snippet>
+        private RAGSnippetQueue: QueueBase<Snippet>,
+        private DescriptionAIQueue: QueueBase<TypeForDescriptionAIWorker>
     ) {}
 
     async createSnippet(snippet : typeCreateSnippetValidator, auth: RequestJWT["auth"] ) {
@@ -31,14 +33,33 @@ export class SnippetService {
         Object.assign(snippetToCreate,snippet)
 
         const snippetSaved = await this.snippetRepository.save(snippetToCreate)
-        console.log(snippetSaved)
+
         /** snipped created
          *
          * Inizio RAG
          *
          * */
 
-        await this.RAGSnippetQueue.add("create_RAG",snippetToCreate)
-        
+        let operationWorker : "RAG" | "DESCRIPTIONAI"
+
+        if(snippetSaved.description) {
+
+            await this.RAGSnippetQueue.add("create_RAG", snippetToCreate)
+            operationWorker = "RAG"
+
+        } else {
+
+            await this.DescriptionAIQueue.add("CreateDescriptionAI", {
+                id: snippetToCreate.id,
+                code: snippetToCreate.code,
+            })
+            operationWorker = "DESCRIPTIONAI"
+
+        }
+
+        return {
+            snippet: snippetSaved,
+            operation: operationWorker
+        }
     }
 }

@@ -1,6 +1,5 @@
 import {DefaultEventsMap, Server, Socket} from "socket.io";
 
-
 export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
 
     const snippetIO = io.of("snippet")
@@ -8,7 +7,8 @@ export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, 
         snippetIO.on("connection", (socket: Socket) => {
             console.log("connesso:", socket.id)
 
-            socket.on("join", () => {
+            socket.on("join", (room) => {
+                socket.join(`snippet:${room}`)
                 console.log("joined")
             })
 
