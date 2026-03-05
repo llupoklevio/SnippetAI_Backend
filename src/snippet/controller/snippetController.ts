@@ -38,7 +38,6 @@ export const postSnippet = async (req: RequestJWT, res: Response) => {
     if(snippetResult.operation === "DESCRIPTIONAI")
         req.log.info(`${email} sta facendo la descrizione dello snippet tramite AI `)
 
-
     const responseSnippet : IResponseSnippet = await ResponsePostSnippet.parseAsync(snippetResult.snippet)
 
     res.json({
