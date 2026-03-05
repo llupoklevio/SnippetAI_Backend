@@ -22,7 +22,7 @@ export const createSnippetValidator = z.object({
     description: op(
         z.string()
             .trim()
-            .min(20,"Description is required")
+            .min(20,"Description must be a minimum of 20 characters")
             .optional(),
         {example: "Deep example of description"}
     )

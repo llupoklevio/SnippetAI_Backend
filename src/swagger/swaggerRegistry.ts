@@ -25,7 +25,7 @@ export const getSwaggerDoc = () => {
             },
             {
                 name: 'Snippet',
-                description: 'Gestione snippet utenti',
+                description: 'Gestione snippetPost utenti',
             }
         ]
     })

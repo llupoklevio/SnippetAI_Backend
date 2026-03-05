@@ -25,7 +25,7 @@ const main = async () => {
                 synchronize: false,
                 database: db,
                 migrationsSetup: {
-                    migrations: ["dist/migrations/*.js"]
+                    migrations: schema === "production" ? ["dist/migrations/*.js"] : []
                 }
             })
         }else{

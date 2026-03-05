@@ -32,7 +32,7 @@ export const SchemaPostSnippet = {
 registry.registerPath(
     postSnippet({
         path: "/snippets",
-        summary: "creation of snippet",
+        summary: "creation of snippetPost",
         send: SchemaPostSnippet.Send,
         error400: SchemaPostSnippet.Error400,
         response: SchemaPostSnippet.Response,
