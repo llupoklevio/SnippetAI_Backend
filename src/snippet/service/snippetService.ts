@@ -44,14 +44,14 @@ export class SnippetService {
 
         if(snippetSaved.description) {
 
-            await this.RAGSnippetQueue.add("create_RAG", snippetToCreate)
+            await this.RAGSnippetQueue.add("create_RAG", snippetSaved)
             operationWorker = "RAG"
 
         } else {
 
             await this.DescriptionAIQueue.add("CreateDescriptionAI", {
-                id: snippetToCreate.id,
-                code: snippetToCreate.code,
+                id: snippetSaved.id,
+                code: snippetSaved.code,
             })
             operationWorker = "DESCRIPTIONAI"
 
