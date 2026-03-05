@@ -6,6 +6,7 @@ import {Document} from "@langchain/core/documents";
 import {Snippet} from "../entities/postgres/snippet.entity.js";
 import {Chroma} from "@langchain/community/vectorstores/chroma";
 import {Namespace} from "socket.io";
+import {DateTime} from "luxon";
 
 
 export class RAGWorker extends WorkerBase<Snippet> {
@@ -34,7 +35,7 @@ export class RAGWorker extends WorkerBase<Snippet> {
             snippetId: job.data.id,
             creator: job.data.snippetOwner.email,
             title: job.data.title,
-            dateCreation: new Date(job.data.dateCreation).toISOString(),
+            dateCreation: DateTime.fromJSDate(new Date(job.data.dateCreation)).toString()
         }
     })
 
