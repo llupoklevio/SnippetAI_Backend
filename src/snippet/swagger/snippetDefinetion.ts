@@ -1,6 +1,7 @@
 import {IbaseStruct} from "../../type/swagger/baseStructureDefinitionAPI.js";
 
-export const postSnippet = ({path,summary,response,send}: IbaseStruct & {send: any}) => ({
+
+export const postSnippet = ({path,summary,response,send, error400, error500,error404}: IbaseStruct & {send: any, error400: any, error404: any}) => ({
     method: "post" as const,
     path: path,
     summary,
@@ -13,6 +14,18 @@ export const postSnippet = ({path,summary,response,send}: IbaseStruct & {send: a
         200: {
             description: "success",
             content: {'application/json': {schema : response}}
+        },
+        400: {
+            description: "validator fail",
+            content: {'application/json': {schema : error400}}
+        },
+        404: {
+            description: "error not found",
+            content: {'application/json': {schema : error404}}
+        },
+        500: {
+            description: "error",
+            content: {'application/json': {schema : error500}}
         }
     }
 })
