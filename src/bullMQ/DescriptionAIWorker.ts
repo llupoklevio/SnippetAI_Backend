@@ -27,8 +27,6 @@ export class DescriptionAIWorker extends WorkerBase<TypeForDescriptionAIWorker> 
 
         let fullDescription = ""
 
-        console.log("######## AIII #########")
-
         for await (const chunk of stream) {
             fullDescription += chunk.content
 
