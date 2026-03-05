@@ -14,7 +14,7 @@ export class Snippet {
     code!: string
 
     @Column({type: 'varchar', length: 255, nullable: true})
-    description?: string;
+    description?: string | null;
 
     @CreateDateColumn({ type: "timestamp" })
     dateCreation!: Date;

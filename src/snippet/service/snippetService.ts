@@ -24,7 +24,7 @@ export class SnippetService {
 
         /** user esiste
          *
-         * Popolamento di snippet
+         * Popolamento di snippetPost
          *
          * */
 

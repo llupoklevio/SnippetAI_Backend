@@ -29,7 +29,7 @@ beforeAll(async () => {
                 id: "123",
                 firstName: "tester",
                 lastName: "snippetAI",
-                email: "test@snippet.it",
+                email: "test@snippetPost.it",
                 password: "hashedpassword"
             })
         } as unknown as UserService)
@@ -110,7 +110,6 @@ beforeAll(async () => {
 
                 const bodyErrorWrong = responseErrorValidatorWrongType.body.errors
                 expect(Object.keys(bodyErrorWrong).length).equal(4);
-
 
                 const typeValidatorPathFirstName = registerValidator.shape['firstName']._def.typeName
                 expect(bodyErrorWrong["firstName"].pop()).equal(`Expected ${zodTypeMap[typeValidatorPathFirstName]}, received ${typeof errorValidatorWrongType.firstName}`);
@@ -204,7 +203,7 @@ beforeAll(async () => {
                 const user = createUser({
                     firstName: "tester",
                     lastName: "snippetAI",
-                    email: "test@snippet.it",
+                    email: "test@snippetPost.it",
                     password: "Snippet20",
                 })
 
@@ -237,7 +236,7 @@ beforeAll(async () => {
                     const user = createUser({
                         firstName: "tester",
                         lastName: "snippetAI",
-                        email: "test@snippet.it",
+                        email: "test@snippetPost.it",
                         password: "Snippet20",
                     })
 

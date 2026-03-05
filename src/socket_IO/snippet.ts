@@ -15,6 +15,7 @@ export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, 
             socket.on("disconnect", () => {
                 console.log("disconnesso:", socket.id)
             })
+
         })
 
 

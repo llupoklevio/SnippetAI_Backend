@@ -25,6 +25,8 @@ export const responseControllerSnippet = z.object({
     message: z.union([z.string(), z.string()]),
 })
 
+export type typeResponseControllerSnippet = z.infer<typeof responseControllerSnippet>;
+
 export const ForDescriptionAIWorker = z.object({
     code: z.string(),
     id: z.number(),

@@ -35,7 +35,7 @@ vi.mock("../../../../src/auth/service/loginService.js", () => {
                     id: "20",
                     firstName: "tester",
                     lastName: "snippetAI",
-                    email: "test@snippet.it",
+                    email: "test@snippetPost.it",
                     password: "hashedpassword",
                     session: undefined
                 } as User,
