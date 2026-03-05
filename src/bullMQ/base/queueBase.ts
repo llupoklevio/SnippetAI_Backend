@@ -10,6 +10,15 @@ export class QueueBase<T> {
     ) {
         this._queue = new Queue(name,{
             connection: this.redisConnection,
+            defaultJobOptions: {
+                attempts: 3,
+                backoff: {
+                    type: 'exponential',
+                    delay: 1000,
+                },
+                removeOnComplete: 100,
+                removeOnFail: 10
+            }
         })
     }
 
