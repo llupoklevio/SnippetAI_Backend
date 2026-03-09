@@ -65,7 +65,7 @@ const main = async () => {
          * **/
         const startServer = app.listen(process.env.PORT_SERVER)
         const io = new Server(startServer, {
-            cors: { origin: "*"}
+            cors: { origin: "*"},
         });
         socketSnippetIO(io)
 

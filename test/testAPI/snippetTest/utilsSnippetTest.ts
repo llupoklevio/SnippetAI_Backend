@@ -10,7 +10,7 @@ export const generateTestToken = (payload  : {idUser: string, email: string} = {
 export const baseData = {
     title: "exampleTitle",
     description: "Deep example of description",
-    code: "Code1",
+    code: "function a(){ return 20 }",
 }
 
 export const baseWrongData = {
@@ -57,3 +57,19 @@ export type typeSnippetService = {
     snippet: Snippet
     operation: "RAG" | "DESCRIPTIONAI"
 }
+
+const socketRAGSchema = z.object({
+    message: z.string(),
+    status: z.number()
+})
+
+export type socketRAG = z.infer<typeof socketRAGSchema>
+
+const socketDesc = z.object({
+    description: z.string(),
+    snippetId: z.number()
+})
+
+export type socketDesc = z.infer<typeof socketDesc>
+
+
