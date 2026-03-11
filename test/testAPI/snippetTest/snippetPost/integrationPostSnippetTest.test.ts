@@ -18,6 +18,8 @@ import {asValue} from "awilix";
 import {RAGWorker} from "../../../../src/bullMQ/RAGWorker";
 import {getRedisConnection} from "../../../../src/redisConnection";
 import {DescriptionAIWorker} from "../../../../src/bullMQ/DescriptionAIWorker";
+import { Chroma } from "@langchain/community/vectorstores/chroma";
+import { OpenAIEmbeddings } from "@langchain/openai";
 
 let snippetRepository: Repository<Snippet>
 let userRepository: Repository<User>;
@@ -113,6 +115,26 @@ describe("Integration Post Snippet", () => {
         expect(postSnippet.body.snippet.snippetOwner.email).equal(defaultUser.email)
 
         expect(postSnippet.body.message).equal("RAG")
+
+        const vectorStore = await Chroma.fromExistingCollection(
+            new OpenAIEmbeddings({ model: "text-embedding-3-large" }),
+            { collectionName: `RagSnippetWorker${postSnippet.body.snippet.snippetOwner.id}` }
+        );
+
+        let titleVectorDB : string = ""
+
+        const results = await vectorStore.similaritySearchWithScore(
+            baseData.description,
+            1
+        );
+
+       results[0]!.forEach(value => {
+           if (typeof value !== "number") {
+               titleVectorDB = value.metadata.title as any
+           }
+        });
+
+       expect(titleVectorDB).equal(postSnippet.body.snippet.title);
     })
 
     it("success generated description by AI", async () => {
