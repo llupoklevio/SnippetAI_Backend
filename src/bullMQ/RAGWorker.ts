@@ -12,7 +12,6 @@ import {DateTime} from "luxon";
 export class RAGWorker extends WorkerBase<Snippet> {
 
     private readonly _embeddings: OpenAIEmbeddings
-    private readonly _vectorStore: Chroma
 
     constructor(
         redisConnection: ConnectionOptions,
@@ -22,14 +21,19 @@ export class RAGWorker extends WorkerBase<Snippet> {
         this._embeddings = new OpenAIEmbeddings({
             model: "text-embedding-3-large"
         })
-        this._vectorStore = new Chroma(this._embeddings, {
-            collectionName: "RagSnippetWorker"
+    }
+
+    private getVector = (id: string) : Chroma  => {
+        return new Chroma(this._embeddings, {
+            collectionName: `RagSnippetWorker${id}`
         })
     }
 
     async operation(job: Job<Snippet>) : Promise<void> {
 
-    const docs = new Document({
+        const vectorStore = this.getVector(job.data.snippetOwner.id)
+
+        const docs = new Document({
         pageContent: job.data.code,
         metadata: {
             snippetId: job.data.id,
@@ -39,18 +43,17 @@ export class RAGWorker extends WorkerBase<Snippet> {
         }
     })
 
-    const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 500,
-        chunkOverlap: 100
-    })
-    const allSplits = await splitter.splitDocuments([docs])
+        const splitter = new RecursiveCharacterTextSplitter({
+            chunkSize: 500,
+            chunkOverlap: 100
+        })
+        const allSplits = await splitter.splitDocuments([docs])
 
-    await this._vectorStore.addDocuments(allSplits)
+        await vectorStore.addDocuments(allSplits)
 
-    this.snippetIO.to(`snippet:${job?.data.id}`).emit("WorkerSuccess", {
-        message: "success RAG",
-        status: 200
-    })
-
+        this.snippetIO.to(`snippet:${job?.data.id}`).emit("WorkerSuccess", {
+            message: "success RAG",
+            status: 200
+        })
     }
 }
