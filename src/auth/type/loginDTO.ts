@@ -30,9 +30,9 @@ export const errorNotFound = z.object({
     type: op(z.string(),{examples: [
             "BusinessLogic"
         ]}),
-    message: op(z.string(),{examples: [
-            "user not found",
-        ]}),
+    message: op(z.string(),{example:
+            "User Not Found",
+        }),
 })
 
 

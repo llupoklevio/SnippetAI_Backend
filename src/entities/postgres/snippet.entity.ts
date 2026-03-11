@@ -22,6 +22,6 @@ export class Snippet {
     @UpdateDateColumn({ type: "timestamp" })
     dateUpdate!: Date;
 
-    @ManyToOne(() => User, (user) => user.personalSnippets, {cascade:["remove"]})
+    @ManyToOne(() => User, (user) => user.personalSnippets)
     snippetOwner!: User;
 }

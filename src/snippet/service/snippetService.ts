@@ -15,6 +15,16 @@ export class SnippetService {
         private DescriptionAIQueue: QueueBase<TypeForDescriptionAIWorker>
     ) {}
 
+
+    async getSnippets(auth: RequestJWT["auth"]){
+        const {email,idUser} = auth!
+
+        const user = await this.userRepository.findByEmailAndId(email,idUser)
+        if(!user) throw new ErrorResponse("NOT_FOUND","BusinessLogic","User Not Found")
+
+        return await this.snippetRepository.getAllSnippet(idUser) as Snippet[]
+    }
+
     async createSnippet(snippet : typeCreateSnippetValidator, auth: RequestJWT["auth"] ) {
 
         const {email,idUser} = auth!

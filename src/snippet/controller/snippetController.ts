@@ -3,7 +3,34 @@ import {RequestJWT} from "../../middleware/jwt/jwtMiddleware.js";
 import {getContainer} from "../../ContainerAwilix/CompositionRoot.js";
 import {typeCreateSnippetValidator} from "../type/validatorPostSnippet.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
-import {IResponseSnippet, ResponsePostSnippet} from "../type/responseSnippet.js";
+import {
+    IResponseSnippet,
+    IResponseSnippets,
+    ResponsePostSnippet,
+    ResponseGetSnippets
+} from "../type/responseSnippet.js";
+
+
+export const getSnippets = async (req: RequestJWT, res: Response) => {
+
+    const email = req.auth?.email
+    const idUser = req.auth?.idUser
+
+    if(!email || !idUser){
+        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
+    }
+
+    req.log.info(`${email} sta ricevendo i propri snippet`)
+
+    const {snippetService} = getContainer().cradle
+    const snippets  = await snippetService.getSnippets({email, idUser} as RequestJWT["auth"])
+
+    const responseSnippetsDTO : IResponseSnippets = await ResponseGetSnippets.parseAsync(snippets)
+
+    res.json({
+        snippets: responseSnippetsDTO
+    })
+}
 
 export const postSnippet = async (req: RequestJWT, res: Response) => {
 

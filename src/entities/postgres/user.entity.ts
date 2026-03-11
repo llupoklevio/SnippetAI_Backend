@@ -24,6 +24,6 @@ export class User {
     @OneToMany(() => UserSession, (session) => session.user, {cascade:["remove"]})
     session?: Relation<UserSession[]>;
 
-    @OneToMany(() => Snippet, (snippet) =>  snippet.snippetOwner)
+    @OneToMany(() => Snippet, (snippet) =>  snippet.snippetOwner, {cascade:["remove"]})
     personalSnippets?: Relation<Snippet[]>
 }

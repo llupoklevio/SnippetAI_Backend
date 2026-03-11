@@ -1,6 +1,6 @@
 import {registry} from "../../swagger/swaggerRegistry.js";
-import {responseControllerSnippet} from "../type/responseSnippet.js";
-import {postSnippet} from "./snippetDefinetion.js";
+import {ResponseAPIGETSnippets, responseControllerSnippet} from "../type/responseSnippet.js";
+import {getSnippets, postSnippet} from "./snippetDefinetion.js";
 import {createSnippetValidator} from "../type/validatorPostSnippet.js";
 import {error400Refresh} from "../../auth/type/refreshDTO.js";
 import {error500} from "../../auth/type/registerDTO.js";
@@ -41,3 +41,29 @@ registry.registerPath(
     })
 )
 
+/** Get snippets */
+
+export const SchemaGetSnippets = {
+    Response: registry.register(
+        'responseGetSnippets',
+        ResponseAPIGETSnippets
+    ),
+    Error404: registry.register(
+        'Error404PostSnippet',
+        errorNotFound
+    ),
+    Error500: registry.register(
+        'Error500PostSnippet',
+        error500
+    )
+}
+
+registry.registerPath(
+    getSnippets({
+        path: "/snippets",
+        summary: "get all personal snippet",
+        response: SchemaGetSnippets.Response,
+        error404: SchemaPostSnippet.Error404,
+        error500: SchemaPostSnippet.Error500
+    })
+)

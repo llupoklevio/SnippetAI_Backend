@@ -36,4 +36,25 @@ export type TypeForDescriptionAIWorker = z.infer<typeof ForDescriptionAIWorker>;
 
 export const error400Snippet = z.union([error400Refresh, AuthValidationBodyError])
 
+/** Get Snippets */
+
+export const ResponseGetSnippets = z.array(z.object({
+    id: z.number(),
+    title: z.string(),
+    code: z.string(),
+    description: z.string().nullable(),
+    dateCreation: z.date(),
+    dateUpdate: z.date(),
+    snippetOwner: z.object({
+        id: z.string(),
+        email: z.string(),
+    })
+}))
+
+export type IResponseSnippets = z.infer<typeof ResponseGetSnippets>;
+
+export const ResponseAPIGETSnippets = z.object({
+    snippets: ResponseGetSnippets
+})
+
 
