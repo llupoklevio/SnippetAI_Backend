@@ -1,9 +1,13 @@
 import {z} from "zod";
-import {extendZodWithOpenApi} from "@asteasolutions/zod-to-openapi";
+import {extendZodWithOpenApi, ZodOpenAPIMetadata} from "@asteasolutions/zod-to-openapi";
 import {error400Refresh} from "../../auth/type/refreshDTO.js";
 import {AuthValidationBodyError} from "../../middleware/validation/validationSchemaBody.js";
 
 extendZodWithOpenApi(z);
+
+function op<T extends z.ZodTypeAny>(schema: T, meta: Partial<ZodOpenAPIMetadata>): T {
+    return (schema as any).openapi(meta);
+}
 
 export const ResponsePostSnippet = z.object({
     id: z.number(),
@@ -64,4 +68,28 @@ export const paramsGetSingleSnippet = z.object({
     idSnippet: z.coerce.number().int().positive()
 })
 
+/** get SingleSnippet */
+
+
+export const error400GetSingleSnippetUserNotFound = z.object({
+    message: op(
+        z.string(),
+        {example:"User Not Found"}
+    ),
+    type: op(z.string(),{examples: [
+            "BusinessLogic"
+        ]}),
+})
+
+export const error400GetSingleSnippetSnippetNotFound = z.object({
+    message: op(
+        z.string(),
+        {example:"User Not Found"}
+    ),
+    type: op(z.string(),{examples: [
+            "BusinessLogic"
+        ]}),
+})
+
+export const error400GetSingleSnippet = z.union([error400GetSingleSnippetSnippetNotFound, error400GetSingleSnippetUserNotFound])
 

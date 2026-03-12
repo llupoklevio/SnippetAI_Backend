@@ -29,3 +29,4 @@ export const createSnippetValidator = z.object({
 })
 
 export type typeCreateSnippetValidator = z.infer<typeof createSnippetValidator>
+

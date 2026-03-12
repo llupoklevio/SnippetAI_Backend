@@ -1,5 +1,6 @@
 import {registry} from "../../swagger/swaggerRegistry.js";
 import {
+    error400GetSingleSnippet,
     paramsGetSingleSnippet,
     ResponseAPIGETSnippets,
     responseControllerSnippet
@@ -92,6 +93,10 @@ export const SchemaGetSingleSnippet = {
         'Error400GetSingleSnippet',
         error400Refresh
     ),
+    Error404: registry.register(
+      "Error404GetSingleSnippet",
+        error400GetSingleSnippet
+    ),
     Error500: registry.register(
         'Error500GetSingleSnippet',
         error500
@@ -105,6 +110,7 @@ registry.registerPath(
         params:   SchemaGetSingleSnippet.Params,
         response: SchemaGetSingleSnippet.Response,
         error400: SchemaGetSingleSnippet.Error400,
+        error404: SchemaGetSingleSnippet.Error404,
         error500: SchemaGetSingleSnippet.Error500
     })
 )
