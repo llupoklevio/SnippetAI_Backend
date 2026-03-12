@@ -61,7 +61,7 @@ export const postSnippet = async (req: RequestJWT, res: Response) => {
     if(snippetResult.operation === "RAG")
         req.log.info(`${email} ha scritto lo snippet sia in DB che nel VDB`)
 
-    /** Manca salvataggio di descrizione su db e dello snippetPost su VDB */
+    /** Manca salvataggio di descrizione su db e dello  su VDB */
     if(snippetResult.operation === "DESCRIPTIONAI")
         req.log.info(`${email} sta facendo la descrizione dello snippet tramite AI `)
 

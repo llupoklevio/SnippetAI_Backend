@@ -17,8 +17,11 @@ const mockUserRepository : IAuthUserRepository = {
 }
 
 const saveSnippetRepositoryMock = vi.fn()
+const getAllSnippetMock = vi.fn()
+
 const mockSnippetRepository : ISnippetRepository = {
-    save: saveSnippetRepositoryMock
+    save: saveSnippetRepositoryMock,
+    getAllSnippet: getAllSnippetMock
 }
 
 const mockRAGSnippetQueue = {
@@ -31,35 +34,35 @@ const mockDescriptionAIQueue = {
 
 let serviceSnippet : SnippetService
 
-describe("Snippet Service Post", () => {
+beforeEach(() => {
+    vi.clearAllMocks()
 
-    beforeEach(() => {
-        vi.clearAllMocks()
-
-        findByEmailAndIdMock.mockResolvedValue({
+    findByEmailAndIdMock.mockResolvedValue({
+        id: "1",
+        email: defaultUser.email,
+        password: "hashedpassword",
+        lastName: defaultUser.lastName,
+        firstName: defaultUser.firstName,
+        personalSnippets: undefined,
+        session: [{
             id: "1",
-            email: defaultUser.email,
-            password: "hashedpassword",
-            lastName: defaultUser.lastName,
-            firstName: defaultUser.firstName,
-            personalSnippets: undefined,
-            session: [{
-                id: "1",
-                expiresAt: DateTime.now().set({day:2}),
-                user: undefined,
-                refreshToken: "token"
-            }] as unknown as UserSession[]
-        } as unknown as User)
-    })
+            expiresAt: DateTime.now().set({day:2}),
+            user: undefined,
+            refreshToken: "token"
+        }] as unknown as UserSession[]
+    } as unknown as User)
+})
 
-    beforeAll(() => {
-        serviceSnippet = new SnippetService(
-            mockSnippetRepository as any,
-            mockUserRepository as any,
-            mockRAGSnippetQueue as any,
-            mockDescriptionAIQueue as any
-        )
-    })
+beforeAll(() => {
+    serviceSnippet = new SnippetService(
+        mockSnippetRepository as any,
+        mockUserRepository as any,
+        mockRAGSnippetQueue as any,
+        mockDescriptionAIQueue as any
+    )
+})
+
+describe("Snippet Service Post", () => {
 
     it("User not found", async () => {
         findByEmailAndIdMock.mockResolvedValue(null)
@@ -160,4 +163,51 @@ describe("Snippet Service Post", () => {
         expect(mockDescriptionAIQueue.add).toHaveBeenCalled()
 
     })
+})
+
+describe("Snippet Get", () => {
+
+    it("response with user not found", async () => {
+        findByEmailAndIdMock.mockResolvedValue(null)
+
+        await expect(serviceSnippet.getSnippets({
+            email: defaultUser.email,
+            idUser: "1"
+        })).rejects.toThrow("User Not Found")
+    })
+
+    it("response with array of Snippet", async () => {
+
+        getAllSnippetMock.mockResolvedValue([
+            {
+                id: 1,
+                title: baseData.title,
+                code: baseData.code,
+                description: baseData.description,
+                dateUpdate: DateTime.now().toJSDate(),
+                dateCreation: DateTime.now().toJSDate(),
+                snippetOwner: {
+                    id: "1",
+                    email: defaultUser.email,
+                    password: "hashedpassword",
+                    lastName: defaultUser.lastName,
+                    firstName: defaultUser.firstName,
+                    personalSnippets: undefined,
+                    session: undefined
+                }
+            }
+        ] as Snippet[])
+
+       const responseSnippets = await serviceSnippet.getSnippets({
+            email: defaultUser.email,
+            idUser: "1"
+       })
+
+       responseSnippets.forEach(snippet => {
+           expect(snippet.title).equal(baseData.title)
+           expect(snippet.code).equal(baseData.code)
+           expect(snippet.snippetOwner.email).equal(defaultUser.email)
+       })
+    })
+
 })

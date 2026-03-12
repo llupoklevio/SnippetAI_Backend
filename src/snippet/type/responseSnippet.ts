@@ -57,4 +57,6 @@ export const ResponseAPIGETSnippets = z.object({
     snippets: ResponseGetSnippets
 })
 
+export type typeResponseAPIGETSnippets = z.infer<typeof ResponseAPIGETSnippets>;
+
 

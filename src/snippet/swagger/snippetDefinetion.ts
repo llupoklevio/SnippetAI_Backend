@@ -30,7 +30,7 @@ export const postSnippet = ({path,summary,response,send, error400, error500,erro
     }
 })
 
-export const getSnippets = ({path,summary,response, error404,error500} : IbaseStruct & {error404: any}) => ({
+export const getSnippets = ({path,summary,response,error400, error404,error500} : IbaseStruct & {error400: any,error404: any}) => ({
     method: "get" as const,
     path: path,
     summary,
@@ -40,6 +40,10 @@ export const getSnippets = ({path,summary,response, error404,error500} : IbaseSt
         200: {
             description: "success",
             content: {'application/json': {schema : response}}
+        },
+        400: {
+          description: "jwt error",
+          content: {'application/json': {schema : error400}}
         },
         404: {
             description: "error not found",

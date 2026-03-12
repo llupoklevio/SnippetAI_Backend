@@ -9,7 +9,7 @@ import request from "supertest";
 import app from "../../../../src/app";
 import { Server } from "socket.io"
 import { io as ioClient, Socket } from "socket.io-client"
-import {baseData, socketDesc, socketRAG} from "../utilsSnippetTest";
+import {baseData, createSnippet, PostSnippetAPI, socketDesc, socketRAG} from "../utilsSnippetTest";
 import http from "http"
 import {socketSnippetIO} from "../../../../src/socket_IO/snippet";
 import {UserSession} from "../../../../src/entities/postgres/userSession";
@@ -20,6 +20,7 @@ import {getRedisConnection} from "../../../../src/redisConnection";
 import {DescriptionAIWorker} from "../../../../src/bullMQ/DescriptionAIWorker";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import {typeResponseAPIGETSnippets, typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
 
 let snippetRepository: Repository<Snippet>
 let userRepository: Repository<User>;
@@ -162,4 +163,72 @@ describe("Integration Post Snippet", () => {
         expect(postSnippet.body.message).equal("DESCRIPTIONAI")
 
     },15_000)
+})
+
+describe("Integration Get Snippet", async () => {
+
+    beforeEach(async () => {
+
+        await snippetRepository
+            .createQueryBuilder()
+            .delete()
+            .from(Snippet)
+            .execute()
+
+        await userSessionRepository
+            .createQueryBuilder()
+            .delete()
+            .from(UserSession)
+            .execute()
+
+        await userRepository
+            .createQueryBuilder()
+            .delete()
+            .from(User)
+            .execute()
+
+
+        session = await getTokenByLoggedUser(request,app,expect)
+    })
+
+    it("Get All snippet", async () => {
+
+        const firstAPI : typeResponseControllerSnippet = await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet())
+
+        const secondAPI : typeResponseControllerSnippet = await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet({
+            description: "Deep example of description 2",
+            title: "secondTitle",
+            code: "secondCode",
+        }))
+
+        const thirdAPI = await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet({
+            description: "Deep example of description 3",
+            title: "thridTitle",
+            code: "thridCode",
+        }))
+
+        const snippetToCheck : typeResponseControllerSnippet[] = []
+        snippetToCheck.push(firstAPI, secondAPI, thirdAPI)
+
+        const getSnippet = await request(httpServer)
+            .get('/snippets')
+            .set("Authorization", `Bearer ${session.accessToken}`)
+
+        expect(getSnippet.status).equal(200)
+
+        const getSnippetBody : typeResponseAPIGETSnippets = getSnippet.body
+
+        console.log(getSnippetBody,"##### API GET #####")
+        console.log(snippetToCheck,"##### ARRAY CHECK GET #####")
+
+
+        getSnippetBody.snippets.forEach((snippet, index) => {
+            expect(snippet.title).equal(snippetToCheck[index]!.snippet.title)
+            expect(snippet.code).equal(snippetToCheck[index]!.snippet.code)
+            expect(snippet.description).equal(snippetToCheck[index]!.snippet.description)
+            expect(snippet.snippetOwner.email).equal(snippetToCheck[index]!.snippet.snippetOwner.email)
+        })
+
+    })
+
 })

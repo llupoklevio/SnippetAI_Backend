@@ -17,10 +17,11 @@ import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
 import {asValue} from "awilix";
 import {SnippetService} from "../../../../src/snippet/service/snippetService";
 import {typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
+import {Snippet} from "../../../../src/entities/postgres/snippet.entity";
 
 
 const mockCreateSnippet = vi.fn()
-
+const mockGetSnippets = vi.fn()
 
 beforeAll(async () => {
     getContainer().register({
@@ -30,6 +31,7 @@ beforeAll(async () => {
             userRepository: vi.fn() as any,
             RAGSnippetQueue: vi.fn() as any,
             DescriptionAIQueue: vi.fn() as any,
+            getSnippets: mockGetSnippets,
         } as unknown as SnippetService),
     })
 })
@@ -218,5 +220,56 @@ describe("SNIPPET API", () => {
             expect(responseSnippet.snippet.description).equal(null)
 
         })
+    })
+
+    describe("Get Snippets", () => {
+
+        describe("Controller ", () => {
+
+            it("no token send", async () => {
+
+                const responseGetSnippet = await request(app)
+                    .get("/snippets")
+
+                expect(responseGetSnippet.status).equal(400)
+                expect(responseGetSnippet.body.message).equal("No authorization token was found")
+            })
+
+            it("response", async () => {
+
+                mockGetSnippets.mockResolvedValue([{
+                    code: baseData.code,
+                    description: baseData.description,
+                    title: baseData.title,
+                    snippetOwner: {
+                        id: "123",
+                        firstName: "tester",
+                        lastName: "snippetAI",
+                        email: defaultUser.email,
+                        password: "hashedpassword"
+                    },
+                    id: 1,
+                    dateCreation: new Date(),
+                    dateUpdate: new Date()
+                }] as Snippet[])
+
+                const responseGetSnippet = await request(app)
+                    .get("/snippets")
+                    .set("Authorization", `Bearer ${generateTestToken()}`)
+
+                expect(responseGetSnippet.status).equal(200)
+                expect(responseGetSnippet.body.snippets).toMatchObject([
+                    {
+                        id: 1,
+                        code: baseData.code,
+                        description: baseData.description,
+                        title: baseData.title,
+                    }
+                ])
+                expect(responseGetSnippet.body.snippets.snippetOwner?.password).equal(undefined)
+            })
+
+        })
+
     })
 })

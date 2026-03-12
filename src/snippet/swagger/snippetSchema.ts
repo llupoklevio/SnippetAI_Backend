@@ -48,6 +48,10 @@ export const SchemaGetSnippets = {
         'responseGetSnippets',
         ResponseAPIGETSnippets
     ),
+    Error400: registry.register(
+        'Error400PostSnippet',
+        error400Refresh
+    ),
     Error404: registry.register(
         'Error404PostSnippet',
         errorNotFound
@@ -63,6 +67,7 @@ registry.registerPath(
         path: "/snippets",
         summary: "get all personal snippet",
         response: SchemaGetSnippets.Response,
+        error400: SchemaPostSnippet.Error400,
         error404: SchemaPostSnippet.Error404,
         error500: SchemaPostSnippet.Error500
     })

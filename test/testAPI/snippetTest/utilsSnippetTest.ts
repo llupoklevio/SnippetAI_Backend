@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import {createSnippetValidator, typeCreateSnippetValidator} from "../../../src/snippet/type/validatorPostSnippet";
 import {z} from "zod";
 import {Snippet} from "../../../src/entities/postgres/snippet.entity";
+import http from "http";
+import {expect} from "vitest";
 
 export const generateTestToken = (payload  : {idUser: string, email: string} = { idUser: "user-123", email: "test@unit.com" }) => {
     return jwt.sign(payload, process.env.SECRET_JWT!, { expiresIn: "1h" });
@@ -51,6 +53,17 @@ export function getChecks(path: pathSnippetPost): { type: string, err: string }[
 
 export const createSnippet = (snippet : typeCreateSnippetValidator = baseData) => {
     return snippet
+}
+
+export const PostSnippetAPI = async (request : any,httpServer: http.Server,session : string,data : typeCreateSnippetValidator ) => {
+   const response = await request(httpServer)
+        .post('/snippets')
+        .set("Authorization", `Bearer ${session}`)
+        .send(data)
+
+    expect(response.status).equal(200)
+
+    return response.body
 }
 
 export type typeSnippetService = {
