@@ -9,7 +9,27 @@ import {
     ResponsePostSnippet,
     ResponseGetSnippets
 } from "../type/responseSnippet.js";
+import {Snippet} from "../../entities/postgres/snippet.entity.js";
 
+
+export const getSingleSnippets = async (req: RequestJWT, res: Response) => {
+    const email = req.auth?.email
+    const idUser = req.auth?.idUser
+    const {idSnippet} = (req as any).params
+
+    if(!email || !idUser){
+        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
+    }
+
+    const {snippetService} = getContainer().cradle
+    const snippet : Snippet = await snippetService.getSingleSnippet({email, idUser} as RequestJWT["auth"], Number(idSnippet))
+
+    const responseSnippetDTO : IResponseSnippet = await ResponsePostSnippet.parseAsync(snippet)
+
+    res.json({
+        snippet: responseSnippetDTO
+    })
+}
 
 export const getSnippets = async (req: RequestJWT, res: Response) => {
 
@@ -71,6 +91,5 @@ export const postSnippet = async (req: RequestJWT, res: Response) => {
         snippet: responseSnippet,
         message: snippetResult.operation,
     })
-
 
 }

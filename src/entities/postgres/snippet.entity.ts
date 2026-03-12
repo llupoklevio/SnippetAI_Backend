@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn} from "typeorm";
 import {User} from "./user.entity.js";
 
 @Entity()
@@ -23,5 +23,5 @@ export class Snippet {
     dateUpdate!: Date;
 
     @ManyToOne(() => User, (user) => user.personalSnippets)
-    snippetOwner!: User;
+    snippetOwner!: Relation<User>;
 }

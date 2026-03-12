@@ -60,3 +60,8 @@ export const ResponseAPIGETSnippets = z.object({
 export type typeResponseAPIGETSnippets = z.infer<typeof ResponseAPIGETSnippets>;
 
 
+export const paramsGetSingleSnippet = z.object({
+    idSnippet: z.coerce.number().int().positive()
+})
+
+

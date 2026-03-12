@@ -25,6 +25,18 @@ export class SnippetService {
         return await this.snippetRepository.getAllSnippet(idUser) as Snippet[]
     }
 
+    async getSingleSnippet(auth: RequestJWT["auth"], idSnippet : number){
+        const {email,idUser} = auth!
+
+        const user = await this.userRepository.findByEmailAndId(email,idUser)
+        if(!user) throw new ErrorResponse("NOT_FOUND","BusinessLogic","User Not Found")
+
+        const snippet = await this.snippetRepository.getSingleSnippet(idSnippet,idUser)
+        if(!snippet) throw new ErrorResponse("NOT_FOUND","BusinessLogic","Snippet Not Found")
+
+        return snippet
+    }
+
     async createSnippet(snippet : typeCreateSnippetValidator, auth: RequestJWT["auth"] ) {
 
         const {email,idUser} = auth!
@@ -41,7 +53,6 @@ export class SnippetService {
         const snippetToCreate = new Snippet()
         snippetToCreate.snippetOwner = user
         Object.assign(snippetToCreate,snippet)
-
         const snippetSaved = await this.snippetRepository.save(snippetToCreate)
 
         /** snipped created

@@ -25,7 +25,7 @@ const main = async () => {
                 synchronize: false,
                 database: db,
                 migrationsSetup: {
-                    migrations: schema === "production" ? ["dist/migrations/*.js"] : []
+                    migrations: process.env.NODE_ENV === "production" ? ["dist/migrations/*.js"] : []
                 }
             })
         }else{

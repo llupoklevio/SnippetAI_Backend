@@ -12,6 +12,18 @@ export class SnippetRepository implements ISnippetRepository{
          return this.dataSource.getRepository(Snippet).save(snippet)
     }
 
+    async getSingleSnippet(snippetId: number, idUser: string): Promise<Snippet | null> {
+        return this.dataSource.getRepository(Snippet).findOne({
+            relations:['snippetOwner'],
+            where: {
+                id: snippetId,
+                snippetOwner: {
+                    id: idUser,
+                }
+            }
+        })
+    }
+
     async getAllSnippet(id: string): Promise<Snippet[]> {
         return this.dataSource.getRepository(Snippet).find({
             relations: ['snippetOwner'],

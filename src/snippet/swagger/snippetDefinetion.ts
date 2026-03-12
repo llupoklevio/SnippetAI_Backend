@@ -1,6 +1,5 @@
 import {IbaseStruct} from "../../type/swagger/baseStructureDefinitionAPI.js";
 
-
 export const postSnippet = ({path,summary,response,send, error400, error500,error404}: IbaseStruct & {send: any, error400: any, error404: any}) => ({
     method: "post" as const,
     path: path,
@@ -24,7 +23,7 @@ export const postSnippet = ({path,summary,response,send, error400, error500,erro
             content: {'application/json': {schema : error404}}
         },
         500: {
-            description: "error",
+            description: "server error",
             content: {'application/json': {schema : error500}}
         }
     }
@@ -50,8 +49,33 @@ export const getSnippets = ({path,summary,response,error400, error404,error500} 
             content: {'application/json': {schema : error404}}
         },
         500: {
-            description: "error",
+            description: "server error",
             content: {'application/json': {schema : error500}}
         }
     }
+})
+
+export const getSingleSnippet = ({path,summary,response,error400,error500,params} : IbaseStruct & {error400: any,params: any}) => ({
+  method: "get" as const,
+  path: path,
+  summary,
+  tags: ['Snippet'],
+  security: [{ bearerAuth: [] }],
+  request: {
+      params: params
+  },
+  responses: {
+      200:{
+          description: "success",
+          content: {'application/json': {schema : response}}
+      },
+      400: {
+          description: "jwt error",
+          content: {'application/json': {schema : error400}}
+      },
+      500: {
+          description: "server error",
+          content: {'application/json': {schema : error500}}
+      }
+  }
 })
