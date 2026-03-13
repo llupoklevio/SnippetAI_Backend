@@ -11,7 +11,6 @@ import {
 } from "../type/responseSnippet.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
 
-
 export const getSingleSnippets = async (req: RequestJWT, res: Response) => {
     const email = req.auth?.email
     const idUser = req.auth?.idUser
@@ -30,6 +29,13 @@ export const getSingleSnippets = async (req: RequestJWT, res: Response) => {
         snippet: responseSnippetDTO
     })
 }
+
+/** Per la V2
+ *
+ * Prendere gli snippet direttamente da user (personal Snippet)
+ * Rendere getSnippets un API per vedere tutti gli snippet degli user iscritti
+ *
+ * */
 
 export const getSnippets = async (req: RequestJWT, res: Response) => {
 
@@ -81,7 +87,7 @@ export const postSnippet = async (req: RequestJWT, res: Response) => {
     if(snippetResult.operation === "RAG")
         req.log.info(`${email} ha scritto lo snippet sia in DB che nel VDB`)
 
-    /** Manca salvataggio di descrizione su db e dello  su VDB */
+    /** Manca salvataggio di descrizione su DB e dello snippet su VDB */
     if(snippetResult.operation === "DESCRIPTIONAI")
         req.log.info(`${email} sta facendo la descrizione dello snippet tramite AI `)
 

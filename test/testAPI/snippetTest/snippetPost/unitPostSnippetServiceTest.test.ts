@@ -18,10 +18,12 @@ const mockUserRepository : IAuthUserRepository = {
 
 const saveSnippetRepositoryMock = vi.fn()
 const getAllSnippetMock = vi.fn()
+const getSingleSnippetMock = vi.fn()
 
 const mockSnippetRepository : ISnippetRepository = {
     save: saveSnippetRepositoryMock,
-    getAllSnippet: getAllSnippetMock
+    getAllSnippet: getAllSnippetMock,
+    getSingleSnippet: getSingleSnippetMock
 }
 
 const mockRAGSnippetQueue = {
@@ -208,6 +210,61 @@ describe("Snippet Get", () => {
            expect(snippet.code).equal(baseData.code)
            expect(snippet.snippetOwner.email).equal(defaultUser.email)
        })
+    })
+
+})
+
+
+describe("Single Snippet", () => {
+
+    it("user not found", async () => {
+
+        findByEmailAndIdMock.mockResolvedValue(null)
+
+        await expect(serviceSnippet.getSingleSnippet({
+            email: defaultUser.email,
+            idUser: "1"
+        }, 1)).rejects.toThrow("User Not Found")
+
+    })
+
+    it("snippet not found", async () => {
+
+        getSingleSnippetMock.mockResolvedValue(null)
+
+        await expect(serviceSnippet.getSingleSnippet({
+            email: defaultUser.email,
+            idUser: "1"
+        }, 1)).rejects.toThrow("Snippet Not Found")
+
+    })
+
+    it("response with single Snippet", async () => {
+
+        getSingleSnippetMock.mockResolvedValue({
+            id: 1,
+            title: baseData.title,
+            code: baseData.code,
+            description: baseData.description,
+            dateUpdate: DateTime.now().toJSDate(),
+            dateCreation: DateTime.now().toJSDate(),
+            snippetOwner: {
+                id: "20",
+                email: defaultUser.email,
+                password: "hashedpassword",
+                lastName: defaultUser.lastName,
+                firstName: defaultUser.firstName,
+                personalSnippets: undefined,
+            }
+        } as Snippet)
+
+        await serviceSnippet.getSingleSnippet({
+            email: defaultUser.email,
+            idUser: "20"
+        }, 1)
+
+        expect(getSingleSnippetMock).toHaveBeenCalledWith(1,"20")
+
     })
 
 })

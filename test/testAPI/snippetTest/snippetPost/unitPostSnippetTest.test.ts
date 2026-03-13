@@ -16,12 +16,14 @@ import {IAuthValidationError} from "../../../../src/middleware/validation/valida
 import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
 import {asValue} from "awilix";
 import {SnippetService} from "../../../../src/snippet/service/snippetService";
-import {typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
+import {IResponseSnippet, typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
 import {Snippet} from "../../../../src/entities/postgres/snippet.entity";
+import {DateTime} from "luxon";
 
 
 const mockCreateSnippet = vi.fn()
 const mockGetSnippets = vi.fn()
+const mockGetSingleSnippet = vi.fn()
 
 beforeAll(async () => {
     getContainer().register({
@@ -32,6 +34,7 @@ beforeAll(async () => {
             RAGSnippetQueue: vi.fn() as any,
             DescriptionAIQueue: vi.fn() as any,
             getSnippets: mockGetSnippets,
+            getSingleSnippet: mockGetSingleSnippet
         } as unknown as SnippetService),
     })
 })
@@ -271,5 +274,72 @@ describe("SNIPPET API", () => {
 
         })
 
+    })
+
+    describe("Get Single Snippets", () => {
+
+        it("validator params error", async () => {
+
+            const response = await request(app)
+                .get(`/snippets/test`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+
+            expect(response.status).equal(400)
+            expect(response.body[0].error).equal("is not number")
+
+            const responseNegative = await request(app)
+                .get(`/snippets/${-20}`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+
+            expect(responseNegative.status).equal(400)
+            expect(responseNegative.body[0].error).equal("is not positive")
+
+        })
+
+        it("jwt", async () => {
+            const response = await request(app)
+            .get(`/snippets/${1}`)
+
+            expect(response.status).equal(400)
+            expect(response.status).equal(400)
+            expect(response.body.message).equal("No authorization token was found")
+        })
+
+        it("response", async () => {
+
+            mockGetSingleSnippet.mockResolvedValue({
+                id: 1,
+                title: baseData.title,
+                code: baseData.code,
+                description: baseData.description,
+                dateUpdate: DateTime.now().toJSDate(),
+                dateCreation: DateTime.now().toJSDate(),
+                snippetOwner: {
+                    id: "123",
+                    personalSnippets: undefined,
+                    session: undefined,
+                    firstName: defaultUser.firstName,
+                    lastName: defaultUser.lastName,
+                    email: defaultUser.email,
+                    password: defaultUser.password,
+                }
+            } as Snippet)
+
+            const response = await request(app)
+                .get(`/snippets/${1}`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+
+
+            expect(response.status).equal(200)
+            expect(typeof response.body).equal("object")
+            expect(response.body.snippet).to.not.equal(undefined)
+            expect(response.body.snippet).to.not.equal(null)
+
+            const responseBody : IResponseSnippet = response.body.snippet
+            expect(responseBody.code).equal(baseData.code)
+            expect(responseBody.description).equal(baseData.description)
+            expect(responseBody.snippetOwner.email).equal(defaultUser.email)
+            expect((responseBody.snippetOwner as any).password).to.be.equal(undefined)
+        })
     })
 })

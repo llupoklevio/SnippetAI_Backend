@@ -13,7 +13,11 @@ export const validationSchemaParams = (params : z.ZodObject<z.ZodRawShape>) => a
 
         if(err instanceof ZodError){
 
-            return res.status(400).json(err.message)
+            const errors = err.errors.map(err => ({
+                 error: err.message,
+            }))
+
+            return res.status(400).json(errors)
 
         }else if(err instanceof Error){
 

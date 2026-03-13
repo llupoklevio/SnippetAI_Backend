@@ -63,13 +63,11 @@ export const ResponseAPIGETSnippets = z.object({
 
 export type typeResponseAPIGETSnippets = z.infer<typeof ResponseAPIGETSnippets>;
 
-
-export const paramsGetSingleSnippet = z.object({
-    idSnippet: z.coerce.number().int().positive()
-})
-
 /** get SingleSnippet */
 
+export const paramsGetSingleSnippet = z.object({
+    idSnippet: z.coerce.number({invalid_type_error: "is not number"}).int("is not number").positive("is not positive"),
+})
 
 export const error400GetSingleSnippetUserNotFound = z.object({
     message: op(

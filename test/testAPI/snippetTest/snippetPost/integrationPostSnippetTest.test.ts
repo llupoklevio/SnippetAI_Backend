@@ -218,10 +218,6 @@ describe("Integration Get Snippet", async () => {
 
         const getSnippetBody : typeResponseAPIGETSnippets = getSnippet.body
 
-        console.log(getSnippetBody,"##### API GET #####")
-        console.log(snippetToCheck,"##### ARRAY CHECK GET #####")
-
-
         getSnippetBody.snippets.forEach((snippet, index) => {
             expect(snippet.title).equal(snippetToCheck[index]!.snippet.title)
             expect(snippet.code).equal(snippetToCheck[index]!.snippet.code)
@@ -229,6 +225,60 @@ describe("Integration Get Snippet", async () => {
             expect(snippet.snippetOwner.email).equal(snippetToCheck[index]!.snippet.snippetOwner.email)
         })
 
+    })
+
+})
+
+describe("Integtration Get Single Snippet", () => {
+
+    beforeEach(async () => {
+
+        await snippetRepository
+            .createQueryBuilder()
+            .delete()
+            .from(Snippet)
+            .execute()
+
+        await userSessionRepository
+            .createQueryBuilder()
+            .delete()
+            .from(UserSession)
+            .execute()
+
+        await userRepository
+            .createQueryBuilder()
+            .delete()
+            .from(User)
+            .execute()
+
+
+        session = await getTokenByLoggedUser(request,app,expect)
+    })
+
+    it("Get Single Snippet", async () => {
+
+        await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet())
+
+        const secondAPI : typeResponseControllerSnippet = await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet({
+            description: "Deep example of description 2",
+            title: "secondTitle",
+            code: "secondCode",
+        }))
+
+         await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet({
+            description: "Deep example of description 3",
+            title: "thridTitle",
+            code: "thridCode",
+        }))
+
+        const singleSnippet = await request(httpServer)
+            .get(`/snippets/${secondAPI.snippet.id}`)
+            .set("Authorization", `Bearer ${session.accessToken}`)
+
+        expect(singleSnippet.status).equal(200)
+        expect(singleSnippet.body.snippet.id).equal(secondAPI.snippet.id)
+
+        expect(singleSnippet.body.snippet.title).equal(secondAPI.snippet.title)
     })
 
 })
