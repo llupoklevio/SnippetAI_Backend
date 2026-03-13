@@ -7,6 +7,8 @@ function op<T extends z.ZodTypeAny>(schema: T, meta: Partial<ZodOpenAPIMetadata>
     return (schema as any).openapi(meta);
 }
 
+/** POST SNIPPET  */
+
 export const createSnippetValidator = z.object({
     title: op(
         z.string()
@@ -30,3 +32,19 @@ export const createSnippetValidator = z.object({
 
 export type typeCreateSnippetValidator = z.infer<typeof createSnippetValidator>
 
+/** POST SNIPPET DESC AI  */
+
+export const DescAIValidator = z.object({
+    description: z.string()
+        .trim()
+        .min(20,"Description must be a minimum of 20 characters"),
+})
+
+export type typeDescAIValidator = z.infer<typeof DescAIValidator>
+
+
+export const idSnippetValidator = z.object({
+    idSnippet: z.coerce.number({invalid_type_error: "is not number"}).positive("is not positive"),
+})
+
+export type typeIdSnippetValidator = z.infer<typeof idSnippetValidator>

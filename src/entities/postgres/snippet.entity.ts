@@ -13,7 +13,7 @@ export class Snippet {
     @Column({type: 'text'})
     code!: string
 
-    @Column({type: 'varchar', length: 255, nullable: true})
+    @Column({type: 'text', nullable: true})
     description?: string | null;
 
     @CreateDateColumn({ type: "timestamp" })

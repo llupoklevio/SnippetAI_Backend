@@ -15,6 +15,7 @@ export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, 
 
         })
 
+
         snippetIO.on("connection", (socket: Socket) => {
             console.log("connesso:", socket.id)
 

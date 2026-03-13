@@ -16,7 +16,10 @@ export abstract class WorkerBase<T> {
             concurrency: 3
         })
 
-        this._worker.on('failed', (job, _err) => {
+        this._worker.on('failed', (job, err) => {
+
+            console.error(err, "###########")
+
             snippetIO.to(`snippet:${job?.data.id}`).emit("WorkerError", {
                 error: "Error RAG",
                 snippetAI: job?.data.id,

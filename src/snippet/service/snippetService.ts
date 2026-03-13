@@ -83,4 +83,44 @@ export class SnippetService {
             operation: operationWorker
         }
     }
+
+    /** PATCH PARZIALE */
+
+    async patchSnippet(snippet: Partial<Snippet>,auth: RequestJWT["auth"],idSnippet: number){
+
+        const {email,idUser} = auth!
+
+        const user = await this.userRepository.findByEmailAndId(email,idUser)
+        if(!user) throw new ErrorResponse("NOT_FOUND","BusinessLogic","User Not Found")
+
+        const snippetToUpdate = await this.getSingleSnippet(auth,idSnippet)
+        /**
+         * Prende solo il singolo snippet che appartiene all'utente
+         * Eccezione se non appartiene allo user lo snippet
+         **/
+
+        Object.assign(snippetToUpdate,snippet)
+
+        return this.snippetRepository.save(snippetToUpdate)
+    }
+
+    async addDescriptionAI(idSnippet : number, auth: RequestJWT["auth"] , descriptionAI : string) {
+
+        const snippetToAddDesc = await this.getSingleSnippet(auth!,idSnippet)
+
+        /**
+         * Prende solo il singolo snippet che appartiene all'utente
+         * Eccezione se non appartiene allo user lo snippet
+         **/
+
+        snippetToAddDesc.description = descriptionAI
+
+        const snippetSaved = await this.patchSnippet(snippetToAddDesc, auth, idSnippet)
+
+        await this.RAGSnippetQueue.add("create_RAG", snippetSaved)
+
+        return snippetSaved
+
+    }
+
 }

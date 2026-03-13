@@ -1,7 +1,7 @@
 import {Response} from "express";
 import {RequestJWT} from "../../middleware/jwt/jwtMiddleware.js";
 import {getContainer} from "../../ContainerAwilix/CompositionRoot.js";
-import {typeCreateSnippetValidator} from "../type/validatorPostSnippet.js";
+import {typeCreateSnippetValidator, typeDescAIValidator, typeIdSnippetValidator} from "../type/validatorPostSnippet.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {
     IResponseSnippet,
@@ -96,6 +96,39 @@ export const postSnippet = async (req: RequestJWT, res: Response) => {
     res.json({
         snippet: responseSnippet,
         message: snippetResult.operation,
+    })
+
+}
+
+export const saveSnippetWithDescriptionAI = async (req: RequestJWT, res: Response) => {
+
+    const email = req.auth?.email
+    const idUser = req.auth?.idUser
+
+    if(!email || !idUser){
+        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
+    }
+
+    /** prendiamo i parametri e il body datosi dal validator */
+
+    const {description} : typeDescAIValidator = (req as any).validDataBody
+    const {idSnippet} : typeIdSnippetValidator= (req as any).params
+
+    req.log.info(`${email} inizia a salvare la descrizione sul db `)
+
+    /**
+     * Prendiamo dal DB lo snippet
+     * Aggiungiamo la descrizione
+     * Una volta salvato nel DB, lo salviamo pure nel VDB
+     **/
+
+    const {snippetService} = getContainer().cradle
+    const responseSnippet = await snippetService.addDescriptionAI(idSnippet,{email,idUser} as RequestJWT["auth"],description)
+
+    const responseSnippetDTO : IResponseSnippet = await ResponsePostSnippet.parseAsync(responseSnippet)
+
+    res.json({
+        snippet: responseSnippetDTO,
     })
 
 }
