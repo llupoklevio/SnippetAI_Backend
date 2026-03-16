@@ -15,6 +15,7 @@ import {RAGWorker} from "../bullMQ/RAGWorker.js";
 import {Namespace} from "socket.io";
 import {DescriptionAIQueue} from "../bullMQ/DescriptionAIQueue.js";
 import {DescriptionAIWorker} from "../bullMQ/DescriptionAIWorker.js";
+import {Chroma} from "@langchain/community/vectorstores/chroma";
 
 let _container: AwilixContainer<Definitions> | null = null;
 
@@ -46,6 +47,8 @@ interface Definitions {
     /** Socket */
     snippetIO: Namespace
 
+    /** Chroma */
+    vectorStore: Chroma
 }
 export async function buildContainer() {
 
@@ -78,7 +81,8 @@ export async function buildContainer() {
 
         /** Worker */
         RAGWorker: asClass(RAGWorker).singleton(),
-        DescriptionAIWorker: asClass(DescriptionAIWorker).singleton()
+        DescriptionAIWorker: asClass(DescriptionAIWorker).singleton(),
+
 
     })
 

@@ -1,6 +1,6 @@
 import {ISnippetRepository} from "./interface/ISnippetRepository.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
-import {DataSource} from "typeorm";
+import {DataSource, In} from "typeorm";
 
 export class SnippetRepository implements ISnippetRepository{
 
@@ -34,5 +34,17 @@ export class SnippetRepository implements ISnippetRepository{
             }
         })
     }
+
+
+    async getSnippetsById(snippetId: number[]): Promise<Snippet[]> {
+
+        return this.dataSource.getRepository(Snippet).find({
+            relations: ['snippetOwner'],
+            where: {
+                id: In(snippetId)
+            }
+        })
+    }
+
 
 }

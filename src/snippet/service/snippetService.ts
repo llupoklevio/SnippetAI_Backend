@@ -6,15 +6,30 @@ import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {Snippet} from "../../entities/postgres/snippet.entity.js";
 import {QueueBase} from "../../bullMQ/base/queueBase.js";
 import {TypeForDescriptionAIWorker} from "../type/responseSnippet.js";
+import {Chroma} from "@langchain/community/vectorstores/chroma";
+import {OpenAIEmbeddings} from "@langchain/openai";
 
 export class SnippetService {
+
+    private readonly _embeddings : OpenAIEmbeddings
+
     constructor(
         private snippetRepository: ISnippetRepository,
         private userRepository: IAuthUserRepository,
         private RAGSnippetQueue: QueueBase<Snippet>,
         private DescriptionAIQueue: QueueBase<TypeForDescriptionAIWorker>
-    ) {}
+    ) {
+        this._embeddings = new OpenAIEmbeddings({
+            model: "text-embedding-3-large"
+        })
+    }
 
+    private getVector = (id: string) : Chroma => {
+
+            return new Chroma(this._embeddings, {
+                collectionName: `RagSnippetWorker${id}`
+            })
+    }
 
     async getSnippets(auth: RequestJWT["auth"]){
         const {email,idUser} = auth!
@@ -121,6 +136,36 @@ export class SnippetService {
 
         return snippetSaved
 
+    }
+
+    async similaritySearch(auth: RequestJWT["auth"], query: string){
+
+        const {email,idUser} = auth!
+
+        const user = await this.userRepository.findByEmailAndId(email,idUser)
+        if(!user) throw new ErrorResponse("NOT_FOUND","BusinessLogic","User Not Found")
+
+        const vectorSearch = this.getVector(user.id)
+
+        const resultByVDB = await vectorSearch.similaritySearchWithScore(query, 10, {
+            creator: user.email,
+        })
+
+        console.log(resultByVDB)
+
+        /** Mi restituisce solo i personali snipppet */
+
+        const minScore = Math.min(...resultByVDB.map(([, score]) => score))
+
+        if(minScore > 1.2){
+           throw new ErrorResponse("NOT_FOUND","BusinessLogic","Snippets Not Found")
+        }
+
+        const resultSnippetToSave = resultByVDB.filter(([doc, score]) =>  score <= minScore * 1.2 && doc.metadata.creator === user.email).map(doc => {
+            return doc[0].metadata.snippetId
+        }) as number[]
+
+        return this.snippetRepository.getSnippetsById(resultSnippetToSave)
     }
 
 }

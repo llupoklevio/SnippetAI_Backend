@@ -99,3 +99,25 @@ export const responseAPIPostSnippetDescAI = z.object({
 })
 
 export type typeResponseAPIPostSnippetDescAI = z.infer<typeof responseAPIPostSnippetDescAI>
+
+export const error404ResponsePostSnippetVDB = z.object({
+    message: op(
+        z.string(),
+        {example:"Snippets Not Found"}
+    ),
+    type: op(z.string(),{examples: [
+            "BusinessLogic"
+        ]}),
+})
+
+export const error404ResponsePostUserVDB = z.object({
+    message: op(
+        z.string(),
+        {example:"User Not Found"}
+    ),
+    type: op(z.string(),{examples: [
+            "BusinessLogic"
+        ]}),
+})
+
+export const error404ResponseAPIPostSnippetVDB = z.union([error404ResponsePostSnippetVDB,error404ResponsePostUserVDB])

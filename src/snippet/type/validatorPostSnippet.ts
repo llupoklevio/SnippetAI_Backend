@@ -50,3 +50,14 @@ export const idSnippetValidator = z.object({
 })
 
 export type typeIdSnippetValidator = z.infer<typeof idSnippetValidator>
+
+/** GET SNIPPET BY VDB  */
+
+export const validatorQuerySearch = z.object({
+    query: z.string()
+        .trim()
+        .min(1,"query is required"),
+})
+
+export type typeValidatorQuerySearch = z.infer<typeof validatorQuerySearch>
+

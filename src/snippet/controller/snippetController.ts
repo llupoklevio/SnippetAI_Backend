@@ -1,7 +1,12 @@
 import {Response} from "express";
 import {RequestJWT} from "../../middleware/jwt/jwtMiddleware.js";
 import {getContainer} from "../../ContainerAwilix/CompositionRoot.js";
-import {typeCreateSnippetValidator, typeDescAIValidator, typeIdSnippetValidator} from "../type/validatorPostSnippet.js";
+import {
+    typeCreateSnippetValidator,
+    typeDescAIValidator,
+    typeIdSnippetValidator,
+    typeValidatorQuerySearch
+} from "../type/validatorPostSnippet.js";
 import {ErrorResponse} from "../../middleware/error/ErrorResponse.js";
 import {
     IResponseSnippet,
@@ -131,4 +136,27 @@ export const saveSnippetWithDescriptionAI = async (req: RequestJWT, res: Respons
         snippet: responseSnippetDTO,
     })
 
+}
+
+export const SearchVectorDbSnippet = async (req: RequestJWT, res: Response) => {
+
+    const email = req.auth?.email
+    const idUser = req.auth?.idUser
+
+    if(!email || !idUser){
+        throw new ErrorResponse("JWT_ERROR","BusinessLogic","Problem with JWT: see if you sending token")
+    }
+
+    const {query} : typeValidatorQuerySearch = (req as any).validDataBody
+
+    req.log.info(`${email} sta facendo una ricerca semantica`)
+
+    const {snippetService} = getContainer().cradle
+    const snippets = await snippetService.similaritySearch({email,idUser} as RequestJWT["auth"],query)
+
+    const responseSnippetsDTO : IResponseSnippets = await ResponseGetSnippets.parseAsync(snippets)
+
+    res.json({
+        snippets: responseSnippetsDTO
+    })
 }

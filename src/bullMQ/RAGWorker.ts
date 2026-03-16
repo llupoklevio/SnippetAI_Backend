@@ -34,7 +34,7 @@ export class RAGWorker extends WorkerBase<Snippet> {
         const vectorStore = this.getVector(job.data.snippetOwner.id)
 
         const docs = new Document({
-        pageContent: job.data.code,
+        pageContent: `${job.data.code}\n${job.data.description ?? ""}`,
         metadata: {
             snippetId: job.data.id,
             creator: job.data.snippetOwner.email,

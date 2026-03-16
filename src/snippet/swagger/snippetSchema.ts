@@ -1,12 +1,23 @@
 import {registry} from "../../swagger/swaggerRegistry.js";
 import {
-    error400GetSingleSnippet,
+    error400GetSingleSnippet, error404ResponseAPIPostSnippetVDB,
     paramsGetSingleSnippet,
     ResponseAPIGETSnippets, responseAPIPostSnippetDescAI,
     responseControllerSnippet
 } from "../type/responseSnippet.js";
-import {getSingleSnippet, getSnippets, postSnippet, postSnippetDescAI} from "./snippetDefinetion.js";
-import {createSnippetValidator, DescAIValidator, idSnippetValidator} from "../type/validatorPostSnippet.js";
+import {
+    getSingleSnippet,
+    getSnippets,
+    postSnippet,
+    postSnippetDescAI,
+    postSnippetSimilaritySearch
+} from "./snippetDefinetion.js";
+import {
+    createSnippetValidator,
+    DescAIValidator,
+    idSnippetValidator,
+    validatorQuerySearch
+} from "../type/validatorPostSnippet.js";
 import {error400Refresh} from "../../auth/type/refreshDTO.js";
 import {error500} from "../../auth/type/registerDTO.js";
 import {errorNotFound} from "../../auth/type/loginDTO.js";
@@ -145,5 +156,40 @@ registry.registerPath(
         params: SchemaPostDescAI.Params,
         send: SchemaPostDescAI.Send,
         error500: SchemaPostDescAI.Error500
+    })
+)
+
+export const SchemaPostSnippetsVectorDB = {
+    Send: registry.register(
+        'sendPostSearchVDB',
+        validatorQuerySearch
+    ),
+    Response: registry.register(
+        'responsePostSearchVDB',
+        ResponseAPIGETSnippets
+    ),
+    Error400: registry.register(
+        'Error400PostSearchVDB',
+        error400Refresh
+    ),
+    Error404: registry.register(
+        "Error404PostSearchVDB",
+        error404ResponseAPIPostSnippetVDB
+    ),
+    Error500: registry.register(
+        'Error500PostSearchVDB',
+        error500
+    )
+}
+
+registry.registerPath(
+    postSnippetSimilaritySearch({
+        path: "/snippets/SimilaritySearch",
+        summary: "API used for similarity research on snippet",
+        send: SchemaPostSnippetsVectorDB.Send,
+        response: SchemaPostSnippetsVectorDB.Response,
+        error400: SchemaPostSnippetsVectorDB.Error400,
+        error404: SchemaPostSnippetsVectorDB.Error404,
+        error500: SchemaPostSnippetsVectorDB.Error500
     })
 )
