@@ -91,3 +91,11 @@ export const error400GetSingleSnippetSnippetNotFound = z.object({
 
 export const error400GetSingleSnippet = z.union([error400GetSingleSnippetSnippetNotFound, error400GetSingleSnippetUserNotFound])
 
+
+/** post SnippetDescAI */
+
+export const responseAPIPostSnippetDescAI = z.object({
+    snippet: ResponsePostSnippet
+})
+
+export type typeResponseAPIPostSnippetDescAI = z.infer<typeof responseAPIPostSnippetDescAI>

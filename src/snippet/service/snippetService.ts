@@ -115,7 +115,7 @@ export class SnippetService {
 
         snippetToAddDesc.description = descriptionAI
 
-        const snippetSaved = await this.patchSnippet(snippetToAddDesc, auth, idSnippet)
+        const snippetSaved = await this.snippetRepository.save(snippetToAddDesc)
 
         await this.RAGSnippetQueue.add("create_RAG", snippetSaved)
 

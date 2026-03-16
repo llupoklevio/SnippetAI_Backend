@@ -44,7 +44,9 @@ export type typeDescAIValidator = z.infer<typeof DescAIValidator>
 
 
 export const idSnippetValidator = z.object({
-    idSnippet: z.coerce.number({invalid_type_error: "is not number"}).positive("is not positive"),
+    idSnippet: z.coerce
+        .number({invalid_type_error: "is not number"})
+        .positive("is not positive"),
 })
 
 export type typeIdSnippetValidator = z.infer<typeof idSnippetValidator>

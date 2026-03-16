@@ -245,11 +245,9 @@ beforeAll(async () => {
                         .send(user)
 
                     if(i==9){
-                        console.log(responseUser.body)
                         expect(responseUser.status).equal(201);
                     }
                     if(i==10){
-                        console.log(responseUser.body)
                         expect(responseUser.status).equal(429);
                     }
                 }

@@ -10,20 +10,24 @@ import {
     getChecks,
     typeSnippetService
 } from "../utilsSnippetTest";
-import {createSnippetValidator} from "../../../../src/snippet/type/validatorPostSnippet";
+import {createSnippetValidator, DescAIValidator} from "../../../../src/snippet/type/validatorPostSnippet";
 import {defaultUser, zodTypeMap} from "../../authTest/utilsAuthTest";
 import {IAuthValidationError} from "../../../../src/middleware/validation/validationSchemaBody";
 import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
 import {asValue} from "awilix";
 import {SnippetService} from "../../../../src/snippet/service/snippetService";
-import {IResponseSnippet, typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
+import {
+    IResponseSnippet,
+    typeResponseAPIPostSnippetDescAI,
+    typeResponseControllerSnippet
+} from "../../../../src/snippet/type/responseSnippet";
 import {Snippet} from "../../../../src/entities/postgres/snippet.entity";
 import {DateTime} from "luxon";
-
 
 const mockCreateSnippet = vi.fn()
 const mockGetSnippets = vi.fn()
 const mockGetSingleSnippet = vi.fn()
+const mockAddDescriptionAI = vi.fn()
 
 beforeAll(async () => {
     getContainer().register({
@@ -34,6 +38,7 @@ beforeAll(async () => {
             RAGSnippetQueue: vi.fn() as any,
             DescriptionAIQueue: vi.fn() as any,
             getSnippets: mockGetSnippets,
+            addDescriptionAI: mockAddDescriptionAI,
             getSingleSnippet: mockGetSingleSnippet
         } as unknown as SnippetService),
     })
@@ -341,5 +346,144 @@ describe("SNIPPET API", () => {
             expect(responseBody.snippetOwner.email).equal(defaultUser.email)
             expect((responseBody.snippetOwner as any).password).to.be.equal(undefined)
         })
+    })
+
+    describe("Add Snippets with description", () => {
+
+        it("validator params error", async () => {
+
+            const response = await request(app)
+                .post(`/snippets/test/saveDescAI`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+
+            expect(response.status).equal(400)
+            expect(response.body[0].error).equal("is not number")
+
+
+            const responseNegative = await request(app)
+                .post(`/snippets/-20/saveDescAI`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+
+            expect(responseNegative.status).equal(400)
+            expect(responseNegative.body[0].error).equal("is not positive")
+        })
+
+
+        describe("validator body error", async () => {
+
+            it("validator body error not send", async () => {
+
+                const responseErrorValidator = await request(app)
+                    .post(`/snippets/1/saveDescAI`)
+                    .set("Authorization", `Bearer ${generateTestToken()}`)
+
+                expect(responseErrorValidator.status).equal(400)
+
+                expect(responseErrorValidator.body.message).equal("Error - Invalid data input");
+
+                const bodyError = responseErrorValidator.body.errors
+                expect(bodyError["path"].pop()).equal("Required");
+            })
+
+            it("validator body error empty", async () => {
+
+                const responseErrorValidator = await request(app)
+                    .post(`/snippets/1/saveDescAI`)
+                    .set("Authorization", `Bearer ${generateTestToken()}`)
+                    .send({})
+
+                expect(responseErrorValidator.status).equal(400)
+
+                expect(responseErrorValidator.body.message).equal("Error - Invalid data input");
+
+                const bodyError = responseErrorValidator.body.errors
+                expect(Object.keys(bodyError).length).equal(1);
+
+                expect(bodyError["description"].pop()).equal("Required");
+            })
+
+            it("validator body error wrong type", async () => {
+
+                const responseErrorValidator = await request(app)
+                    .post(`/snippets/1/saveDescAI`)
+                    .set("Authorization", `Bearer ${generateTestToken()}`)
+                    .send({
+                        description: 20,
+                    })
+
+                expect(responseErrorValidator.status).equal(400)
+                expect(responseErrorValidator.body.message).equal("Error - Invalid data input");
+
+                const bodyError = responseErrorValidator.body.errors
+                expect(Object.keys(bodyError).length).equal(1);
+
+                const typeValidatorDescription = DescAIValidator.shape['description']._def.typeName
+                expect(bodyError["description"].pop()).equal(`Expected ${zodTypeMap[typeValidatorDescription]}, received ${typeof baseWrongData.description}`);
+
+            })
+
+            it("validator body error wrong value", async () => {
+
+                const responseErrorValidator = await request(app)
+                    .post(`/snippets/1/saveDescAI`)
+                    .set("Authorization", `Bearer ${generateTestToken()}`)
+                    .send({
+                        description: "description",
+                    })
+
+                expect(responseErrorValidator.status).equal(400)
+                expect(responseErrorValidator.body.message).equal("Error - Invalid data input");
+
+                const bodyError = responseErrorValidator.body.errors
+                expect(Object.keys(bodyError).length).equal(1);
+
+                const errorDescription = getChecks('description')
+                expect(errorDescription.length).equal(1);
+                expect(errorDescription.some(e => e.type === "min")).equal(true);
+            })
+
+        })
+
+        it("success", async () => {
+
+            mockAddDescriptionAI.mockResolvedValue({
+                description: baseData.description,
+                title: baseData.title,
+                code: baseData.code,
+                id:1,
+                dateCreation: DateTime.now().toJSDate(),
+                dateUpdate: DateTime.now().toJSDate(),
+                snippetOwner: {
+                    id: "1",
+                    firstName: defaultUser.firstName,
+                    lastName: defaultUser.lastName,
+                    email: defaultUser.email,
+                    password: "hashed",
+                    session: undefined,
+                    personalSnippets: undefined,
+                }
+            } as Snippet)
+
+            const response = await request(app)
+                .post(`/snippets/1/saveDescAI`)
+                .set("Authorization", `Bearer ${generateTestToken()}`)
+                .send({
+                    description: baseData.description,
+                })
+
+            expect(response.status).equal(200)
+
+            const responseSnippet : typeResponseAPIPostSnippetDescAI = response.body
+
+            expect(responseSnippet.snippet.snippetOwner.email).equal(defaultUser.email)
+            expect(responseSnippet.snippet.snippetOwner.id).equal("1")
+            expect((responseSnippet.snippet.snippetOwner as any).password).equal(undefined)
+
+            expect(responseSnippet.snippet.title).equal(baseData.title)
+            expect(responseSnippet.snippet.code).equal(baseData.code)
+            expect(responseSnippet.snippet.description).equal(baseData.description)
+        })
+
+
     })
 })

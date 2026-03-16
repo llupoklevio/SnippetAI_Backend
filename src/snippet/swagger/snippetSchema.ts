@@ -2,11 +2,11 @@ import {registry} from "../../swagger/swaggerRegistry.js";
 import {
     error400GetSingleSnippet,
     paramsGetSingleSnippet,
-    ResponseAPIGETSnippets,
+    ResponseAPIGETSnippets, responseAPIPostSnippetDescAI,
     responseControllerSnippet
 } from "../type/responseSnippet.js";
-import {getSingleSnippet, getSnippets, postSnippet} from "./snippetDefinetion.js";
-import {createSnippetValidator} from "../type/validatorPostSnippet.js";
+import {getSingleSnippet, getSnippets, postSnippet, postSnippetDescAI} from "./snippetDefinetion.js";
+import {createSnippetValidator, DescAIValidator, idSnippetValidator} from "../type/validatorPostSnippet.js";
 import {error400Refresh} from "../../auth/type/refreshDTO.js";
 import {error500} from "../../auth/type/registerDTO.js";
 import {errorNotFound} from "../../auth/type/loginDTO.js";
@@ -112,5 +112,38 @@ registry.registerPath(
         error400: SchemaGetSingleSnippet.Error400,
         error404: SchemaGetSingleSnippet.Error404,
         error500: SchemaGetSingleSnippet.Error500
+    })
+)
+
+
+/** POST SNIPPET DESC AI */
+
+export const SchemaPostDescAI = {
+    Params: registry.register(
+        'paramsPostDescAI',
+        idSnippetValidator
+    ),
+    Send: registry.register(
+        'sendPostDescAI',
+        DescAIValidator
+    ),
+    Response: registry.register(
+        'responsePostDescAI',
+        responseAPIPostSnippetDescAI
+    ),
+    Error500: registry.register(
+        'Error500PostDescAI',
+        error500
+    )
+}
+
+registry.registerPath(
+    postSnippetDescAI({
+        path: "/snippets/{idSnippet}/saveDescAI",
+        summary: "API used for saving description created by AI or Human",
+        response: SchemaPostDescAI.Response,
+        params: SchemaPostDescAI.Params,
+        send: SchemaPostDescAI.Send,
+        error500: SchemaPostDescAI.Error500
     })
 )

@@ -268,3 +268,48 @@ describe("Single Snippet", () => {
     })
 
 })
+
+
+describe("Save Snippet With Description By AI", () => {
+
+    beforeAll(async () => {
+
+        saveSnippetRepositoryMock.mockResolvedValue({
+            id: 1,
+            dateUpdate: DateTime.now().toJSDate(),
+            dateCreation: DateTime.now().toJSDate(),
+            snippetOwner: {
+                id: "1",
+                email: defaultUser.email,
+                password: "hashedpassword",
+                lastName: defaultUser.lastName,
+                firstName: defaultUser.firstName,
+                personalSnippets: undefined,
+                session: [{
+                    id: "1",
+                    expiresAt: DateTime.now().set({day:2}).toJSDate(),
+                    user: undefined,
+                    refreshToken: "token"
+                }] as unknown as UserSession[]
+            } as User,
+            title: baseData.title,
+            description: baseData.description,
+            code: baseData.code,
+        } as Snippet)
+
+    })
+
+    it("Response with snippet and called queue", async () => {
+
+        const ragOperation = await serviceSnippet.addDescriptionAI(1,{
+            idUser: "1",
+            email: defaultUser.email,
+        },baseData.description)
+
+        expect(ragOperation.code).equal(baseData.code)
+        expect(ragOperation.title).equal(baseData.title)
+        expect(ragOperation.description).equal(baseData.description)
+
+        expect(mockSnippetRepository.save).toHaveBeenCalledOnce()
+    })
+})

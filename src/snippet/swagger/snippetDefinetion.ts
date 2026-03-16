@@ -83,3 +83,25 @@ export const getSingleSnippet = ({path,summary,response,error400,error404,error5
       }
   }
 })
+
+export const postSnippetDescAI = ({path,summary,response,params,send,error500} : IbaseStruct & {send: any, params: any}) => ({
+    method: "post" as const,
+    path: path,
+    summary,
+    tags: ['Snippet'],
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: params,
+        body: { content: { 'application/json': { schema: send } } }
+    },
+    responses: {
+        200:{
+            description: "success",
+            content: {'application/json': {schema : response}}
+        },
+        500: {
+            description: "server error",
+            content: {'application/json': {schema : error500}}
+        }
+    }
+})

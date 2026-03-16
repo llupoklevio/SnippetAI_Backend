@@ -15,12 +15,10 @@ import {socketSnippetIO} from "../../../../src/socket_IO/snippet";
 import {UserSession} from "../../../../src/entities/postgres/userSession";
 import {getContainer} from "../../../../src/ContainerAwilix/CompositionRoot";
 import {asValue} from "awilix";
-import {RAGWorker} from "../../../../src/bullMQ/RAGWorker";
-import {getRedisConnection} from "../../../../src/redisConnection";
-import {DescriptionAIWorker} from "../../../../src/bullMQ/DescriptionAIWorker";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import {typeResponseAPIGETSnippets, typeResponseControllerSnippet} from "../../../../src/snippet/type/responseSnippet";
+import {limiterStore} from "../../../../src/RateLimiting/rate";
 
 let snippetRepository: Repository<Snippet>
 let userRepository: Repository<User>;
@@ -52,9 +50,10 @@ beforeAll(async () => {
 
     getContainer().register({
         snippetIO: asValue(snippetIO),
-        RAGWorker: asValue(new RAGWorker(getRedisConnection(), snippetIO)),
-        DescriptionAIWorker: asValue(new DescriptionAIWorker(getRedisConnection(), snippetIO))
     })
+
+    getContainer().cradle.RAGWorker
+    getContainer().cradle.DescriptionAIWorker
 
     await new Promise<void>((resolve, reject) => {
         socket.on("connect", () => resolve())
@@ -280,5 +279,92 @@ describe("Integtration Get Single Snippet", () => {
 
         expect(singleSnippet.body.snippet.title).equal(secondAPI.snippet.title)
     })
+})
 
+describe("Integtration Post Snippet Description with AI", () => {
+
+    beforeEach(async () => {
+
+        await snippetRepository
+            .createQueryBuilder()
+            .delete()
+            .from(Snippet)
+            .execute()
+
+        await userSessionRepository
+            .createQueryBuilder()
+            .delete()
+            .from(UserSession)
+            .execute()
+
+        await userRepository
+            .createQueryBuilder()
+            .delete()
+            .from(User)
+            .execute()
+
+
+        session = await getTokenByLoggedUser(request,app,expect)
+
+        socket.off("WorkerSuccess")
+        socket.off("WorkerError")
+        socket.off("description:completed")
+
+        await limiterStore.resetAll()
+    })
+
+    it("Success", async () => {
+
+       const snippetSaved = await PostSnippetAPI(request,httpServer,session.accessToken, createSnippet({
+            title: "thridTitle",
+            code: "thridCode",
+        }))
+
+        const response = await request(httpServer)
+            .post(`/snippets/${snippetSaved.snippet.id}/saveDescAI`)
+            .set("Authorization", `Bearer ${session.accessToken}`)
+            .send({
+                description: "Deep example of description 3",
+            })
+
+        expect(response.status).equal(200)
+
+        socket.emit("join", snippetSaved.snippet.id)
+
+        const socketEvent : socketRAG = await new Promise((resolve, reject) => {
+            socket.on("WorkerSuccess", resolve)
+            socket.on("WorkerError", reject)
+            setTimeout(() => reject(new Error("worker timeout")), 5000)
+        })
+
+        expect(socketEvent.status).equal(200)
+        expect(socketEvent.message).equal("success RAG")
+
+        expect(response.body.snippet.title).equal("thridTitle")
+        expect(response.body.snippet.code).equal("thridCode")
+        expect(response.body.snippet.description).equal(baseData.description+" 3")
+
+        expect(response.body.snippet.snippetOwner.email).equal(defaultUser.email)
+
+        const vectorStore = await Chroma.fromExistingCollection(
+            new OpenAIEmbeddings({ model: "text-embedding-3-large" }),
+            { collectionName: `RagSnippetWorker${response.body.snippet.snippetOwner.id}` }
+        );
+
+        let titleVectorDB : string = ""
+
+        const results = await vectorStore.similaritySearchWithScore(
+            baseData.description,
+            1
+        );
+
+        results[0]!.forEach(value => {
+            if (typeof value !== "number") {
+                titleVectorDB = value.metadata.title as any
+            }
+        });
+
+        expect(titleVectorDB).equal(response.body.snippet.title);
+
+    },20_000)
 })
