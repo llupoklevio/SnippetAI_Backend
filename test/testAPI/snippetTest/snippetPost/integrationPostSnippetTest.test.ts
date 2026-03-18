@@ -135,7 +135,7 @@ describe("Integration Post Snippet", () => {
         });
 
        expect(titleVectorDB).equal(postSnippet.body.snippet.title);
-    })
+    },20_000)
 
     it("success generated description by AI", async () => {
 

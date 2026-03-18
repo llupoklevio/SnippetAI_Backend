@@ -117,7 +117,7 @@ export const SchemaGetSingleSnippet = {
 registry.registerPath(
     getSingleSnippet({
         path:     "/snippets/{idSnippet}",
-        summary:  "get all personal snippet",
+        summary:  "get personal single snippet",
         params:   SchemaGetSingleSnippet.Params,
         response: SchemaGetSingleSnippet.Response,
         error400: SchemaGetSingleSnippet.Error400,

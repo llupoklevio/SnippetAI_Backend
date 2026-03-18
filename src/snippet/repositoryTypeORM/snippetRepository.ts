@@ -35,7 +35,6 @@ export class SnippetRepository implements ISnippetRepository{
         })
     }
 
-
     async getSnippetsById(snippetId: number[]): Promise<Snippet[]> {
 
         return this.dataSource.getRepository(Snippet).find({
