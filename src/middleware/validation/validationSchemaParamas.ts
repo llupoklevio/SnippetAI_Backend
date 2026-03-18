@@ -2,14 +2,13 @@ import {z, ZodError} from "zod";
 import {NextFunction, Request, Response} from "express";
 
 export const validationSchemaParams = (params : z.ZodObject<z.ZodRawShape>) => async (req : Request, res: Response, next: NextFunction) => {
+    
     try{
-
 
         (req as any).params = await params.parseAsync(req.params);
         next()
 
     }catch(err){
-        console.error(err);
 
         if(err instanceof ZodError){
 
