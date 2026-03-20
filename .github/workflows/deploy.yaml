@@ -57,6 +57,8 @@ jobs:
       JWT_REF_EXPIRES_MIN: 30
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       USEAITEST: false
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
 
     steps:
       - name: Checkout
