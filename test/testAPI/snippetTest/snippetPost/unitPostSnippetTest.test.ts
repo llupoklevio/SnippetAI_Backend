@@ -356,8 +356,6 @@ describe("SNIPPET API", () => {
                 .post(`/snippets/test/saveDescAI`)
                 .set("Authorization", `Bearer ${generateTestToken()}`)
 
-            console.log(response,"###########")
-
             expect(response.status).equal(400)
             expect(response.body[0].error).equal("is not number")
 
