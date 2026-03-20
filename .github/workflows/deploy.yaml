@@ -60,6 +60,7 @@ jobs:
       REDIS_HOST: localhost
       REDIS_PORT: 6379
 
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
