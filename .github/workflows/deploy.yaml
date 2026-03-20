@@ -26,6 +26,21 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      chroma:
+        image: chromadb/chroma:latest
+        ports:
+          - 8000:8000
+
     env:
       NODE_ENV: test
       PORT_SERVER: 3000

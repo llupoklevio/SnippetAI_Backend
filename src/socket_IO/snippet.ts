@@ -1,10 +1,9 @@
 import {DefaultEventsMap, Server, Socket} from "socket.io";
-import jwt from "jsonwebtoken";
-import {ErrorResponse} from "../middleware/error/ErrorResponse.js";
 
 export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
     const snippetIO = io.of("snippet")
 
+    /*
         snippetIO.use((socket, next) => {
             const token = socket.handshake.headers.authorization?.split(" ")[1]
 
@@ -15,6 +14,8 @@ export const socketSnippetIO = (io:  Server<DefaultEventsMap, DefaultEventsMap, 
 
         })
 
+
+     */
 
         snippetIO.on("connection", (socket: Socket) => {
             console.log("connesso:", socket.id)

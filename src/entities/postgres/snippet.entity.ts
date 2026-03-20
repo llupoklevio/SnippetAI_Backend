@@ -16,10 +16,10 @@ export class Snippet {
     @Column({type: 'text', nullable: true})
     description?: string | null;
 
-    @CreateDateColumn({ type: "timestamp" })
+    @CreateDateColumn({ type: "timestamptz" })
     dateCreation!: Date;
 
-    @UpdateDateColumn({ type: "timestamp" })
+    @UpdateDateColumn({ type: "timestamptz" })
     dateUpdate!: Date;
 
     @ManyToOne(() => User, (user) => user.personalSnippets)
