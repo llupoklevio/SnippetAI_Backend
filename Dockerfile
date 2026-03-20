@@ -33,12 +33,9 @@ FROM node:24-alpine AS runtime
 WORKDIR /app
 
 COPY --from=build /app/entrypoint.sh ./
+
 RUN chmod +x entrypoint.sh
 RUN mkdir -p /app/dist/migrations
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN chown -R appuser:appgroup /app
-USER appuser
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
