@@ -41,7 +41,10 @@ app.set('trust proxy', 1);
  *
  * */
 app.use(cors({
-    origin: "*"
+    origin: [
+        "https://snippet-ai-frontend.vercel.app",
+        "http://localhost:5173" // dev locale
+    ]
 }));
 
 /** AI */
